@@ -23,7 +23,8 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp -r web-tool/. _site/
+          cp -r web_tool/. _site/
+          ls -la _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
