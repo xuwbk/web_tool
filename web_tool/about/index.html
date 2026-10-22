@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<!--
+ * * 《轩玮导航》 - 关于页面文件
+ * @package XuWbk
+ * @author 轩玮
+ * @version 1.0.0
+ * @created 文件创建升级
+ * @modified 文件修改时间
+ * @description 由《轩玮博客》开发用于导航工具系统
+ * @contact QQ:6050640 邮箱：6050640@qq.com 网址：www.xuwbk.com
+ * @copyright Copyright (c) 2026 by XuWbk.Com, All Rights Reserved.
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#f9f9f9" />
+    <title>关于我们 - 轩玮博客</title>
+    <link rel="shortcut icon" href="../assets/images/favicon.png" />
+    <meta name="keywords" content="轩玮博客,关于我们,IT资源,互联网资源,建站源码,WordPress教程" />
+    <meta name="description" content="轩玮博客（www.xuwbk.com）专注分享建站源码、CMS模板、WordPress教程、实用软件和IT经验，涵盖建站、源码、工具等多类IT内容。" />
+
+    <link rel="stylesheet" id="block-library-css"
+        href="../assets/css/block-library.min-5.6.2.css" type="text/css" media="all" />
+    <link rel="stylesheet" id="iconfont-css" href="../assets/css/iconfont-3.03029.1.css"
+        type="text/css" media="all" />
+    <link rel="stylesheet" id="bootstrap-css" href="../assets/css/bootstrap.min-4.3.1.css"
+        type="text/css" media="all" />
+    <link rel="stylesheet" id="iowen-css" href="../assets/css/style-3.03029.1.css"
+        type="text/css" media="all" />
+    <link rel="stylesheet" id="custom-css" href="../assets/css/custom-style.css"
+        type="text/css" media="all" />
+    <link rel="stylesheet" id="xuwbk-icons-css" href="../assets/css/xuwbk-icons.css" type="text/css" />
+    <link rel="stylesheet" id="xuwbk-footer-css" href="../assets/css/footer.css" type="text/css" media="all" />
+
+    <style>
+        body {
+            background: #f5f7fa;
+            padding: 20px 0;
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .about-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .about-header h1 {
+            font-size: 32px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .about-header p {
+            font-size: 16px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .about-content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .section-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .section-content p {
+            margin-bottom: 15px;
+        }
+
+        .section-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .skill-item i {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .skill-item .skill-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0 0;
+        }
+
+        .contact-list li {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .contact-list li:hover {
+            background: #e9ecef;
+        }
+
+        .contact-list li i {
+            margin-right: 12px;
+            color: #667eea;
+            width: 20px;
+            text-align: center;
+        }
+
+        .contact-list li strong {
+            color: #333;
+            margin-right: 8px;
+            min-width: 80px;
+        }
+
+        .contact-list li a {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .contact-list li a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .back-home a {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .back-home a:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .back-home a i {
+            margin-right: 8px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .about-container {
+                margin: 20px;
+            }
+
+            .about-header {
+                padding: 30px 20px;
+            }
+
+            .about-header h1 {
+                font-size: 26px;
+            }
+
+            .about-content {
+                padding: 30px 20px;
+            }
+
+            .skills-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+
+    <script>
+        !function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"3G9QRCtAm0z4ABfe",ck:"3G9QRCtAm0z4ABfe"});
+    </script>
+</head>
+
+<body class="io-grey-mode">
+    <div class="about-container">
+        <div class="about-header">
+            <h1><i class="xw-ico xw-user"></i> 关于我们</h1>
+            <p>轩玮博客｜专注优质 IT 与互联网资源分享</p>
+        </div>
+
+        <div class="about-content">
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-info"></i>
+                    站点简介
+                </h2>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <p>轩玮博客自上线以来，始终努力坚持搜集和分享各种网络知识与 IT 科技内容。经过长期积累与更新，网站已逐步发展成涵盖多领域的综合性资源博客，为站长、开发者、运营人员以及普通互联网爱好者提供实用、靠谱、可落地的资源与教程。</p>
+                    </div>
+                    <p><strong>网站地址：</strong><a href="https://www.xuwbk.com" target="_blank" rel="noopener">https://www.xuwbk.com</a></p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-book"></i>
+                    一、我们分享什么？
+                </h2>
+                <div class="section-content">
+                    <p>轩玮博客的内容围绕“建站 + 源码 + 工具 + 教程”展开，主要包括：</p>
+                    <p><strong>网站源码：</strong>APP 源码、发卡源码、小说漫画、影视源码、支付源码、游戏源码、授权系统、网址导航等</p>
+                    <p><strong>建站程序与模板插件：</strong>WordPress、Discuz、Emlog、Zblog、帝国 CMS、织梦 CMS、PBootCMS、ThinkPHP、苹果 CMS 等</p>
+                    <p><strong>WordPress 与子比主题生态：</strong>子比美化、主题教程、插件适配、建站实战</p>
+                    <p><strong>实用软件资源：</strong>手机软件、电脑软件、码农开发工具、破解绿化、设计软件、系统主题</p>
+                    <p><strong>亲测源码与经验教程：</strong>服务器配置、WAF、支付对接、扒站工具、商城系统、会员系统</p>
+                    <p><strong>影视与娱乐资源：</strong>影视源码、单机端、游戏服务端、怀旧端游相关资源</p>
+                    <p><strong>活动线报与时下干货：</strong>免费域名、网盘扩容、接码平台、AI 工具、运营技巧</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-globe"></i>
+                    二、网站定位
+                </h2>
+                <div class="section-content">
+                    <p>专注分享优质实用互联网资源，涵盖建站、源码、工具等多类 IT 内容，致力打造专业 IT 博客！</p>
+                    <p>轩玮博客不是单纯搬运站，而是更偏向：</p>
+                    <p><strong>建站人群：</strong>想搭博客、商城、论坛、资源站的人</p>
+                    <p><strong>开发者：</strong>需要源码、接口、插件、框架的人</p>
+                    <p><strong>站长运营：</strong>关注变现、支付、会员、授权、SEO 的人</p>
+                    <p><strong>普通用户：</strong>想找好用软件、教程、影视/游戏资源的人</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-star"></i>
+                    三、核心特色
+                </h2>
+                <div class="section-content">
+                    <p>✅ <strong>资源分类清晰：</strong>源码、模板、软件、教程、线报分区明确</p>
+                    <p>✅ <strong>建站向内容强：</strong>WordPress / 子比主题 / 各类 CMS 覆盖全面</p>
+                    <p>✅ <strong>偏“能落地”：</strong>很多内容强调亲测、可部署、可商用参考</p>
+                    <p>✅ <strong>持续更新：</strong>网站源码、游戏端、AI 工具、软件破解版保持跟进</p>
+                    <p>✅ <strong>适合站长成长：</strong>从零搭站到运营、支付、会员体系都有资料</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-user"></i>
+                    四、适合谁来用？
+                </h2>
+                <div class="section-content">
+                    <p>想自己搭建博客 / 资源站 / 商城站的新手站长</p>
+                    <p>需要 WordPress、子比、Discuz、帝国 CMS 模板插件的人</p>
+                    <p>做源码二开、支付对接、发卡系统、授权系统的开发者</p>
+                    <p>想找安卓/PC 实用软件、绿化版、去广告版的用户</p>
+                    <p>对游戏服务端、怀旧端游、虚拟机一键端感兴趣的人</p>
+                    <p>关注互联网羊毛、免费资源、AI 工具、建站教程的玩家</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="xw-ico xw-link"></i>
+                    五、一句话介绍
+                </h2>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <p>轩玮博客（<a href="https://www.xuwbk.com" target="_blank" rel="noopener">www.xuwbk.com</a>）是一个专注分享建站源码、CMS 模板、WordPress 教程、实用软件和 IT 经验的综合性博客，帮更多人少走弯路，高效获取互联网优质资源。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-home">
+            <a href="/">
+                <i class="xw-ico xw-home"></i>
+                返回首页
+            </a>
+        </div>
+    </div>
+
+    <script src="../assets/js/jquery.min-3.2.1.js"></script>
+<div id="xuwbk-footer"></div>
+<script type="text/javascript" src="../assets/js/footer.js"></script>
+</body>
+</html>

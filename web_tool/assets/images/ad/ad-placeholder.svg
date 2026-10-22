@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="180" viewBox="0 0 600 180">
+    <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f7f8fa" />
+            <stop offset="1" stop-color="#e8edf3" />
+        </linearGradient>
+    </defs>
+    <rect width="600" height="180" fill="url(#g)" />
+    <rect x="8" y="8" width="584" height="164" rx="8" fill="none" stroke="#d6dbe2" stroke-width="2" stroke-dasharray="9 6" />
+    <g fill="#9aa4b2" font-family="Microsoft YaHei, Arial, sans-serif" text-anchor="middle">
+        <text x="300" y="92" font-size="30" fill="#98a2b0">图片广告位</text>
+        <text x="300" y="124" font-size="15" fill="#b4bcc7">把推广图放到 assets/images/ad/ 后替换 src 即可</text>
+    </g>
+</svg>
