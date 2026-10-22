@@ -1,0 +1,1 @@
+# infrlo Python service - 纯标准库，无需安装任何依赖
