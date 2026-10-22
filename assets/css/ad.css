@@ -1,0 +1,221 @@
+/*
+ * 轩玮导航 - 首页广告位（图片 + 文字卡）
+ * @package XuWbk
+ * @author 轩玮
+ * @version 1.1.0
+ * @description 位于首个分类标题上方的广告专区：提示条 + 大横幅 + AD 文字卡片
+ *              宽度完全跟随页面内容区（.content-site），不设固定宽或最大宽
+ * @contact QQ:6050640 邮箱：6050640@qq.com 网址：www.xuwbk.com
+ * @copyright Copyright (c) 2026 by XuWbk.Com, All Rights Reserved.
+ */
+.ad-zone {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 22px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------- 顶部提示条 ---------- */
+.ad-zone .ad-tips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.ad-zone .ad-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ff8a3d, #ff5c00);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.ad-zone .ad-badge i {
+    margin-right: 4px;
+    font-size: 13px;
+}
+
+.ad-zone .ad-tip-text {
+    color: #8a9099;
+    white-space: nowrap;
+}
+
+.ad-zone .ad-join {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 14px;
+    border: 1px solid #ff5c00;
+    border-radius: 20px;
+    color: #ff5c00;
+    font-size: 13px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all .25s ease;
+}
+
+.ad-zone .ad-join i {
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.ad-zone .ad-join:hover {
+    background: #ff5c00;
+    color: #fff;
+}
+
+/* ---------- 大横幅：宽高随容器等比缩放 ---------- */
+.ad-zone .ad-banners {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.ad-zone .ad-banner {
+    display: block;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f2f4f7;
+    min-height: 64px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.ad-zone .ad-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ad-zone .ad-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+/* ---------- AD 文字卡片 ---------- */
+.ad-zone .ad-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.ad-zone .ad-card {
+    display: block;
+    padding: 10px;
+    border: 1px solid #eaedf1;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+    text-decoration: none;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.ad-zone .ad-card:hover {
+    transform: translateY(-2px);
+    border-color: #40e0d0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .1);
+}
+
+.ad-zone .ad-card-head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ad-zone .ad-card-tag {
+    display: inline-block;
+    padding: 1px 7px;
+    margin-right: 7px;
+    border-radius: 3px;
+    background: #e6f7f5;
+    color: #22a79a;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.ad-zone .ad-card-title {
+    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ad-zone .ad-card-pic {
+    display: block;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #f2f4f7;
+    min-height: 48px;
+}
+
+.ad-zone .ad-card-pic img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ad-zone .ad-card-desc {
+    display: block;
+    margin-top: 9px;
+}
+
+.ad-zone .ad-card-desc i {
+    display: block;
+    height: 8px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    background: #eef0f3;
+}
+
+.ad-zone .ad-card-desc i:last-child {
+    width: 62%;
+    margin-bottom: 0;
+}
+
+/* ---------- 响应式：仅调整列数，尺寸仍由容器宽度决定 ---------- */
+@media (max-width: 991.98px) {
+    .ad-zone .ad-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* 移动端（手机）隐藏整个广告区，保持页面简洁；桌面端按原逻辑显示 */
+@media (max-width: 767.98px) {
+    .ad-zone {
+        display: none;
+    }
+}
+
+/* ---------- 夜间模式 ---------- */
+.io-black-mode .ad-zone .ad-tip-text {
+    color: #9aa5b1;
+}
+
+.io-black-mode .ad-zone .ad-banner,
+.io-black-mode .ad-zone .ad-card-pic {
+    background: #2b2f36;
+}
+
+.io-black-mode .ad-zone .ad-card {
+    border-color: #33383f;
+    background: #252a31;
+}
+
+.io-black-mode .ad-zone .ad-card-title {
+    color: #e0e4ea;
+}
+
+.io-black-mode .ad-zone .ad-card-desc i {
+    background: #3a4048;
+}
