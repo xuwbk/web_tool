@@ -6,9 +6,9 @@
 
 项目已成功部署至 GitHub Pages，访问地址如下：
 
-👉 **[https://yanchtao.github.io/web-tool/](https://yanchtao.github.io/web-tool/)**
+👉 **[https://xuwbk.github.io/web_tool/](https://yxuwbk.github.io/web_tool/)**
 
-（注：部署用户名为 `yanchtao`，项目路径为 `web-tool`）
+（注：部署用户名为 `yachtao`，项目路径为 `web-tool`）
 
 ## ✨ 功能特性
 
