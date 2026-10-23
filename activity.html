@@ -995,9 +995,9 @@ function switchNightMode(){
 .sl-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(20,30,60,.06);}
 .sl-table th{background:#f8fafc;color:#6b7280;font-weight:600;font-size:12.5px;text-align:left;padding:13px 12px;border-bottom:1px solid #eef1f6;white-space:nowrap;}
 .sl-table td{padding:12px;border-bottom:1px solid #f0f2f7;color:#4a5568;font-size:13px;vertical-align:middle;}
-.sl-table tr.sl-data{cursor:pointer;}
+.sl-table tr.sl-data{cursor:default;}
 .sl-table tr.sl-data:hover td{background:#fafbff;}
-.sl-name{color:#4f66e0;font-weight:600;text-decoration:none;}
+.sl-name{color:#4f66e0;font-weight:600;text-decoration:none;cursor:pointer;}
 .sl-name:hover{text-decoration:underline;}
 .sl-badge{display:inline-flex;align-items:center;gap:5px;background:#eef2ff;color:#4f5bd5;border-radius:6px;padding:2px 8px;font-size:12px;}
 .sl-badge.dom{background:#e8f7ef;color:#2f9e6d;}
@@ -1017,6 +1017,11 @@ function switchNightMode(){
 .sl-detail-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 22px;padding:16px 18px;}
 .sl-detail-item{font-size:12.5px;color:#6b7280;}
 .sl-detail-item b{color:#39435a;font-weight:600;margin-left:4px;word-break:break-all;}
+.sl-detail-item a{color:#4f66e0;text-decoration:none;}
+.sl-detail-item a:hover{text-decoration:underline;}
+.sl-type-link{cursor:pointer;}
+.sl-url{color:#4f66e0;text-decoration:none;}
+.sl-url:hover{text-decoration:underline;}
 .sl-searchbar{display:flex;align-items:center;gap:10px;margin-top:16px;}
 .sl-searchbar input{flex:1;border:1px solid #e2e6ef;border-radius:8px;height:36px;padding:0 12px;font-size:13px;background:#fff;}
 .fl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:20px;}
@@ -1234,6 +1239,7 @@ function switchNightMode(){
   }
   function persist(list){ MEM=list; try{localStorage.setItem(KEY, JSON.stringify(list));}catch(e){} }
   function find(id){ var l=load(); for(var i=0;i<l.length;i++){ if(l[i].id===id) return l[i]; } return null; }
+  function extUrl(u){ u=String(u||'').trim(); if(!u) return ''; if(!/^https?:\/\//i.test(u)) u='https://'+u; return u; }
 
   var curType='', curStatus='', curKw='';
   function filtered(){ return load().filter(function(it){
@@ -1249,10 +1255,11 @@ function switchNightMode(){
       var ok=it.status!=='失效';
       var tr=document.createElement('tr');
       tr.className='sl-data'; tr.setAttribute('data-id', it.id);
+      var urlHtml = it.url ? '<a class="sl-url" href="'+esc(extUrl(it.url))+'" target="_blank" rel="noopener">'+esc(it.url)+'</a>' : '-';
       tr.innerHTML='<td><input type="checkbox"></td>'+
         '<td><a href="javascript:" class="sl-name">'+esc(it.name)+'</a></td>'+
         '<td><span class="sl-badge '+typeCls(it.type)+'">'+esc(it.type)+'</span></td>'+
-        '<td>'+esc(it.url)+'</td>'+
+        '<td>'+urlHtml+'</td>'+
         '<td><span class="sl-pill '+(ok?'ok':'bad')+'">'+(ok?'正常':'失效')+'</span></td>'+
         '<td>'+esc(it.addDate)+'</td>'+
         '<td>'+esc(it.renewDate)+'</td>'+
@@ -1268,9 +1275,12 @@ function switchNightMode(){
       var dr=document.createElement('tr');
       dr.className='sl-detail'; dr.setAttribute('data-detail', it.id);
       var d=it.detail||{};
-      var rows=[['状态', ok?'正常':'失效'],['类型', it.type],['服务商', d.provider||'-'],['关联邮箱', d.email||'-'],['到期', (days? days+'后':'')+' ('+(it.renewDate||'-')+')'],['备注', it.note||'-']];
-      (TYPE_FIELDS[it.type]||[]).forEach(function(f){ rows.push([f.label, d[f.k]||'-']); });
-      dr.innerHTML='<td colspan="10"><div class="sl-detail-inner">'+rows.map(function(r){return '<div class="sl-detail-item">'+r[0]+'<b>'+esc(r[1])+'</b></div>';}).join('')+'</div></td>';
+      var statusPill='<span class="sl-pill '+(ok?'ok':'bad')+'">'+(ok?'正常':'失效')+'</span>';
+      var typeLink='<a href="javascript:" class="sl-type-link" data-type="'+esc(it.type)+'">'+esc(it.type)+'</a>';
+      var provLink=d.provider? '<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.provider)+'" target="_blank" rel="noopener">'+esc(d.provider)+'</a>' : '-';
+      var rows=[['状态', statusPill],['类型', typeLink],['地址/域名', urlHtml],['服务商', provLink],['关联邮箱', esc(d.email||'-')],['到期', esc((days? days+'后':'')+' ('+(it.renewDate||'-')+')')],['备注', esc(it.note||'-')]];
+      (TYPE_FIELDS[it.type]||[]).forEach(function(f){ rows.push([f.label, esc(d[f.k]||'-')]); });
+      dr.innerHTML='<td colspan="10"><div class="sl-detail-inner">'+rows.map(function(r){return '<div class="sl-detail-item">'+r[0]+'<b>'+r[1]+'</b></div>';}).join('')+'</div></td>';
       tb.appendChild(dr);
     });
   }
@@ -1284,8 +1294,11 @@ function switchNightMode(){
 
   var body=q('slBody');
   if(body){ body.addEventListener('click', function(e){
-    var tr=e.target.closest? e.target.closest('tr.sl-data') : null;
-    var btn=e.target.closest? e.target.closest('button[data-act]') : null;
+    var t=e.target;
+    var typeLink=t.closest? t.closest('a.sl-type-link') : null;
+    if(typeLink){ e.preventDefault(); e.stopPropagation(); var ty=typeLink.getAttribute('data-type')||''; curType=ty; if(q('sl-type')) q('sl-type').value=ty; render(); return; }
+    var btn=t.closest? t.closest('button[data-act]') : null;
+    var tr=t.closest? t.closest('tr.sl-data') : null;
     var id=tr? tr.getAttribute('data-id') : null;
     if(btn){
       e.preventDefault(); e.stopPropagation();
@@ -1296,7 +1309,8 @@ function switchNightMode(){
       else if(act==='delete'){ doDelete(id); }
       return;
     }
-    if(tr){ toggleDetail(id); }
+    var nm=t.closest? t.closest('a.sl-name') : null;
+    if(nm){ var row=nm.closest('tr.sl-data'); if(row){ e.preventDefault(); toggleDetail(row.getAttribute('data-id')); } return; }
   });}
 
   function doDelete(id){
