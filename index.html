@@ -211,14 +211,14 @@
                         <ul>
                             <li id="menu-item-237"
                                 class="menu-item menu-item-type-post_type menu-item-object-page menu-item-237 sidebar-item">
-                                <a href="commit.html" target="_blank">
+                                <a href="javascript:" class="js-open-submit">
                                     <i class="xw-ico xw-upload icon-fw icon-lg mr-2"></i>
                                     <span>网站提交</span></a>
                             </li>
 
 			    <li id="menu-item-212"
                                  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-212 sidebar-item">
-                                 <a href="links.html">
+                                 <a href="javascript:" class="js-open-friendlink">
                                      <i class="xw-ico xw-links icon-fw icon-lg mr-2"></i>
                                      <span>友情链接</span>
                                  </a>
@@ -276,9 +276,9 @@
 			    </li>
 
 			<li >
-				<a href="links.html">
-                                    <i class="xw-ico xw-links xw-lg mr-2"></i>
-                                    <span>友情链接</span>
+				<a href="https://www.xuwbk.com/" target="_blank" rel="noopener">
+                                    <i class="xw-ico xw-globe xw-lg mr-2"></i>
+                                    <span>官方网站</span>
                                 </a>
 				<ul class="sub-menu">
 
@@ -286,9 +286,29 @@
 			    </li>
 
 			<li >
-				<a href="./about">
+				<a href="activity.html">
                                     <i class="xw-ico xw-book xw-lg mr-2"></i>
-                                    <span>关于</span>
+                                    <span>活动线报</span>
+                                </a>
+				<ul class="sub-menu">
+
+				</ul>
+			    </li>
+
+			<li >
+				<a href="tencent://message/?uin=6050640&Site=&Menu=yes" target="_blank" rel="noopener" title="联系QQ：6050640">
+                                    <i class="xw-ico xw-star xw-lg mr-2"></i>
+                                    <span>购买广告</span>
+                                </a>
+				<ul class="sub-menu">
+
+				</ul>
+			    </li>
+
+			<li >
+				<a href="javascript:" class="js-open-submit">
+                                    <i class="xw-ico xw-upload xw-lg mr-2"></i>
+                                    <span>申请收录</span>
                                 </a>
 				<ul class="sub-menu">
 
@@ -296,7 +316,6 @@
 			    </li>
 
 			</ul>
-
 
                         <div class="rounded-circle weather">
                             <div id="he-plugin-simple" style="display: contents;"></div>
@@ -9067,6 +9086,489 @@ function switchNightMode(){
 <!-- 友情链接：申请 / 批准 / 驳回 / 删除，批准后自动加入上方友链区 -->
 
 <script type="text/javascript" src="./assets/js/friendlink.js"></script>
+
+<style>
+#serviceListPanel{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99990;background:#f4f6fb;overflow:auto;display:none;}
+#serviceListPanel.open{display:block;}
+.sl-wrap{max-width:1320px;margin:0 auto;padding:22px 26px 60px;}
+.sl-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.sl-title{font-size:20px;font-weight:700;color:#2b3445;display:flex;align-items:center;gap:10px;}
+.sl-title .sl-bars{letter-spacing:-3px;color:#3b4a63;font-size:18px;}
+.sl-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sl-tools select{border:1px solid #e2e6ef;background:#fff;border-radius:8px;height:34px;padding:0 28px 0 12px;color:#4a5568;font-size:13px;}
+.sl-add{background:#6366f1;color:#fff;border:0;border-radius:8px;height:34px;padding:0 16px;font-size:13px;font-weight:600;cursor:pointer;}
+.sl-add:hover{background:#4f46e5;}
+.sl-close{display:inline-flex;align-items:center;background:#fff;border:1px solid #e2e6ef;border-radius:8px;height:34px;padding:0 14px;cursor:pointer;color:#6b7280;font-size:13px;text-decoration:none;}
+.sl-close:hover{background:#f1f3f9;color:#4f5bd5;}
+.sl-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(20,30,60,.06);}
+.sl-table th{background:#f8fafc;color:#6b7280;font-weight:600;font-size:12.5px;text-align:left;padding:13px 12px;border-bottom:1px solid #eef1f6;white-space:nowrap;}
+.sl-table td{padding:12px;border-bottom:1px solid #f0f2f7;color:#4a5568;font-size:13px;vertical-align:middle;}
+.sl-table tr.sl-data{cursor:pointer;}
+.sl-table tr.sl-data:hover td{background:#fafbff;}
+.sl-name{color:#4f66e0;font-weight:600;text-decoration:none;}
+.sl-name:hover{text-decoration:underline;}
+.sl-badge{display:inline-flex;align-items:center;gap:5px;background:#eef2ff;color:#4f5bd5;border-radius:6px;padding:2px 8px;font-size:12px;}
+.sl-badge.dom{background:#e8f7ef;color:#2f9e6d;}
+.sl-badge.other{background:#f3eefc;color:#7c5cd6;}
+.sl-badge.vps{background:#e6f4ff;color:#2b7fd4;}
+.sl-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;}
+.sl-pill.ok{background:#e7f8ef;color:#1f9d63;}
+.sl-pill.bad{background:#fdeaea;color:#e05252;}
+.sl-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sl-days{color:#1f9d63;font-weight:600;}
+.sl-actions{display:flex;gap:6px;}
+.sl-actions button{width:26px;height:26px;border-radius:6px;border:1px solid #e6e9f2;background:#fff;color:#7b8494;cursor:pointer;font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;}
+.sl-actions button:hover{background:#eef2ff;color:#4f5bd5;border-color:#dfe3f7;}
+.sl-detail{display:none;}
+.sl-detail.open{display:table-row;}
+.sl-detail td{background:#fafbff;padding:0;}
+.sl-detail-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 22px;padding:16px 18px;}
+.sl-detail-item{font-size:12.5px;color:#6b7280;}
+.sl-detail-item b{color:#39435a;font-weight:600;margin-left:4px;word-break:break-all;}
+.sl-searchbar{display:flex;align-items:center;gap:10px;margin-top:16px;}
+.sl-searchbar input{flex:1;border:1px solid #e2e6ef;border-radius:8px;height:36px;padding:0 12px;font-size:13px;background:#fff;}
+.fl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:20px;}
+.fl-overlay.open{display:flex;}
+.fl-dialog{background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.fl-dialog-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eef1f6;}
+.fl-dialog-head h5{margin:0;font-size:16px;font-weight:700;color:#2b3445;}
+.fl-dialog-head .fl-x{border:0;background:transparent;font-size:22px;line-height:1;color:#9aa3b2;cursor:pointer;}
+.fl-dialog-body{padding:18px 20px;}
+.fl-modal-form .form-group{margin-bottom:14px;}
+.fl-modal-form label{font-size:13px;color:#4a5568;margin-bottom:5px;display:block;}
+.fl-modal-form .form-control{width:100%;padding:8px 12px;border:1px solid #e2e6ef;border-radius:8px;font-size:13px;box-sizing:border-box;background:#fff;}
+.fl-modal-form textarea.form-control{min-height:78px;resize:vertical;}
+.fl-modal-form .required{color:#e05252;margin-left:2px;}
+.fl-submit{background:#6366f1;color:#fff;border:0;border-radius:8px;height:38px;padding:0 20px;font-size:14px;font-weight:600;cursor:pointer;}
+.fl-submit:hover{background:#4f46e5;}
+.fl-admin-link{display:inline-block;margin-top:12px;font-size:12.5px;color:#6366f1;text-decoration:none;}
+.fl-admin-link:hover{text-decoration:underline;}
+.sl-form-dialog{max-width:760px;}
+.sl-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;}
+.sl-field label{font-size:13px;color:#4a5568;margin-bottom:5px;display:block;}
+.sl-field .form-control{width:100%;padding:8px 12px;border:1px solid #e2e6ef;border-radius:8px;font-size:13px;box-sizing:border-box;background:#fff;height:38px;}
+.sl-field textarea.form-control{height:auto;min-height:70px;resize:vertical;}
+.sl-section{margin-top:16px;border:1px solid #eef1f6;border-radius:10px;overflow:hidden;}
+.sl-section-head{background:#f8fafc;padding:10px 14px;font-size:13px;font-weight:600;color:#4a5568;cursor:pointer;display:flex;justify-content:space-between;user-select:none;}
+.sl-section.collapsed .sl-section-body{display:none;}
+.sl-section-body{padding:14px;}
+.sl-form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+.sl-reset{background:#fff;border:1px solid #e2e6ef;border-radius:8px;height:38px;padding:0 18px;cursor:pointer;color:#6b7280;}
+.sl-reset:hover{background:#f1f3f9;}
+.sl-pwd-card{background:#fff;border-radius:16px;width:100%;max-width:380px;padding:28px 26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.sl-lock{width:64px;height:64px;border-radius:50%;background:#fdf1d8;color:#e0a526;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.sl-pwd-card h3{margin:0 0 6px;font-size:18px;color:#2b3445;}
+.sl-pwd-card p{margin:0 0 16px;font-size:13px;color:#8b93a3;}
+.sl-pwd-card input{width:100%;height:42px;border:1px solid #c9d2e3;border-radius:10px;padding:0 14px;font-size:14px;box-sizing:border-box;margin-bottom:16px;}
+.sl-pwd-actions{display:flex;gap:12px;justify-content:center;}
+.sl-pwd-actions button{height:40px;padding:0 26px;border-radius:10px;font-size:14px;cursor:pointer;border:1px solid #e2e6ef;background:#fff;color:#4a5568;}
+.sl-pwd-actions #pwdOk{background:#6366f1;color:#fff;border-color:#6366f1;}
+.fl-success-center{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:100001;background:#1f9d63;color:#fff;padding:16px 28px;border-radius:10px;font-size:15px;box-shadow:0 12px 40px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:all .25s;}
+.fl-success-center.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.fl-success-center.err{background:#e05252;}
+@media(max-width:640px){.sl-form-grid{grid-template-columns:1fr;}.sl-detail-inner{grid-template-columns:1fr 1fr;}}
+</style>
+
+<!-- ===== 活动线报：服务列表 ===== -->
+<div id="serviceListPanel">
+  <div class="sl-wrap">
+    <div class="sl-head">
+      <div class="sl-title"><span class="sl-bars">≡</span> 服务列表</div>
+      <div class="sl-tools">
+        <select id="sl-type"><option value="">全部类型</option><option value="主机资源">主机资源</option><option value="VPS资源">VPS资源</option><option value="域名资源">域名资源</option><option value="其他资源">其他资源</option></select>
+        <select id="sl-status"><option value="">全部状态</option><option value="正常">正常</option><option value="失效">失效</option></select>
+        <button class="sl-add" type="button" id="sl-add-btn">＋ 添加服务</button>
+        <a class="sl-close" href="links.html" target="_blank" rel="noopener">管理页面</a>
+        <button class="sl-close" type="button" id="sl-close">返回首页</button>
+      </div>
+    </div>
+    <table class="sl-table">
+      <thead>
+        <tr><th style="width:34px"><input type="checkbox"></th><th>名称</th><th>类型</th><th>地址/域名</th><th>状态</th><th>添加时间</th><th>续费时间</th><th>剩余天数</th><th>备注</th><th>操作</th></tr>
+      </thead>
+      <tbody id="slBody"></tbody>
+    </table>
+    <div class="sl-searchbar">
+      <input id="sl-search" type="text" placeholder="搜索服务名称、IP 或域名...">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 密码弹窗 ===== -->
+<div class="fl-overlay" id="pwdModal">
+  <div class="sl-pwd-card">
+    <div class="sl-lock"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h3 id="pwdTitle">添加服务</h3>
+    <p>请输入管理密码以继续操作</p>
+    <input type="password" id="pwdInput" placeholder="请输入管理密码" autocomplete="off">
+    <div class="sl-pwd-actions">
+      <button type="button" id="pwdCancel">取消</button>
+      <button type="button" id="pwdOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 添加/编辑服务表单 ===== -->
+<div class="fl-overlay" id="formModal">
+  <div class="fl-dialog sl-form-dialog">
+    <div class="fl-dialog-head"><h5 id="formTitle">添加服务</h5><button type="button" class="fl-x" data-fl-close>&times;</button></div>
+    <div class="fl-dialog-body">
+      <form id="serviceForm" class="sl-form" autocomplete="off">
+        <input type="hidden" name="id">
+        <div class="sl-form-grid">
+          <div class="sl-field"><label>服务名称<span style="color:#e05252">*</span></label><input class="form-control" name="name" placeholder="例如：My Free Host"></div>
+          <div class="sl-field"><label>服务类型<span style="color:#e05252">*</span></label><select class="form-control" name="type"><option value="主机资源">主机资源</option><option value="VPS资源">VPS资源</option><option value="域名资源">域名资源</option><option value="其他资源">其他资源</option></select></div>
+          <div class="sl-field"><label>域名/地址<span style="color:#e05252">*</span></label><input class="form-control" name="url" placeholder="例如：example.com 或 192.168.1.1"></div>
+          <div class="sl-field"><label>端口</label><input class="form-control" name="port" placeholder="80"></div>
+          <div class="sl-field"><label>添加时间</label><input type="date" class="form-control" name="addDate"></div>
+          <div class="sl-field"><label>续费/到期时间<span style="color:#e05252">*</span></label><input type="date" class="form-control" name="renewDate"></div>
+          <div class="sl-field"><label>服务商</label><input class="form-control" name="provider" placeholder="例如：InfinityFree"></div>
+          <div class="sl-field"><label>关联邮箱</label><input class="form-control" name="email" placeholder="account@example.com"></div>
+        </div>
+        <div class="sl-field" style="margin-top:14px"><label>备注</label><textarea class="form-control" name="note" placeholder="记录账号信息、特殊配置等..."></textarea></div>
+        <div class="sl-section">
+          <div class="sl-section-head" id="detailToggle">服务特征详情 <span class="sl-toggle">收起</span></div>
+          <div class="sl-section-body"><div id="sl-feature-fields"></div></div>
+        </div>
+        <div class="sl-form-actions"><button type="button" class="sl-reset" id="formReset">重置</button><button type="submit" class="fl-submit">保存服务</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 网站提交（居中弹窗） ===== -->
+<div class="fl-overlay" id="submitModal">
+  <div class="fl-dialog">
+    <div class="fl-dialog-head"><h5>网站提交</h5><button type="button" class="fl-x" data-fl-close>&times;</button></div>
+    <div class="fl-dialog-body">
+      <form id="submitFormInline" class="fl-modal-form" autocomplete="off">
+        <div class="form-group"><label>网站名称<span class="required">*</span></label><input class="form-control" name="name" required></div>
+        <div class="form-group"><label>网站地址<span class="required">*</span></label><input class="form-control" name="url" placeholder="https://example.com" required></div>
+        <div class="form-group"><label>网站分类<span class="required">*</span></label><select class="form-control" name="category"><option value="常用工具">常用工具</option><option value="生物信息">生物信息</option><option value="云服务器">云服务器</option><option value="办公学习">办公学习</option><option value="影音视频">影音视频</option><option value="游戏竞技">游戏竞技</option><option value="网盘资源">网盘资源</option><option value="图标素材">图标素材</option><option value="图标设计">图标设计</option><option value="平面素材">平面素材</option><option value="字体资源">字体资源</option><option value="PPT资源">PPT资源</option><option value="图形创意">图形创意</option><option value="界面设计">界面设计</option><option value="在线配色">在线配色</option><option value="迷你工具">迷你工具</option><option value="谷歌插件">谷歌插件</option><option value="资讯书籍">资讯书籍</option><option value="博客论坛">博客论坛</option><option value="设计规范">设计规范</option><option value="视频教程">视频教程</option><option value="主机资源">主机资源</option><option value="域名资源">域名资源</option><option value="VPS资源">VPS资源</option><option value="其他资源">其他资源</option></select></div>
+        <div class="form-group"><label>网站描述<span class="required">*</span></label><textarea class="form-control" name="desc" required></textarea></div>
+        <div class="form-group"><label>联系方式（QQ 或邮箱）</label><input class="form-control" name="contact"></div>
+        <div class="form-group"><label>图标地址</label><input class="form-control" name="icon" placeholder="选填，留空自动取站点 favicon"></div>
+        <div style="text-align:right"><button type="submit" class="fl-submit">提交</button></div>
+        <a class="fl-admin-link" href="links.html" target="_blank" rel="noopener">进入管理页面（审核） →</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 友情链接（居中弹窗） ===== -->
+<div class="fl-overlay" id="friendlinkModal">
+  <div class="fl-dialog">
+    <div class="fl-dialog-head"><h5>友情链接申请</h5><button type="button" class="fl-x" data-fl-close>&times;</button></div>
+    <div class="fl-dialog-body">
+      <form id="friendFormInline" class="fl-modal-form" autocomplete="off">
+        <div class="form-group"><label>网站名称<span class="required">*</span></label><input class="form-control" name="name" required></div>
+        <div class="form-group"><label>网站地址<span class="required">*</span></label><input class="form-control" name="url" placeholder="https://example.com" required></div>
+        <div class="form-group"><label>网站描述<span class="required">*</span></label><textarea class="form-control" name="desc" required></textarea></div>
+        <div class="form-group"><label>联系方式（QQ 或邮箱）</label><input class="form-control" name="contact"></div>
+        <div style="text-align:right"><button type="submit" class="fl-submit">申请友链</button></div>
+        <a class="fl-admin-link" href="links.html" target="_blank" rel="noopener">进入管理页面（审核） →</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="fl-success-center" id="flSuccessCenter"></div>
+
+<script>
+(function(){
+  var PWD = 'xuwbk.com';
+  var KEY = 'xuwbk_services_v1';
+  var SEED = [{"id":"s1","name":"彩虹云主机","type":"主机资源","url":"mblog.xuwbk.com","status":"正常","addDate":"2026/05/01","renewDate":"2027/05/01","note":"http://mblog.xuw...","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"彩虹云","email":""}},{"id":"s2","name":"profreehost","type":"主机资源","url":"xuanwei.cn.mt/","status":"正常","addDate":"2026/06/15","renewDate":"2034/02/01","note":"Free Web Hostin...","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"ProFreeHost","email":""}},{"id":"s3","name":"InfinityFree","type":"主机资源","url":"xuwbk.gt.tc","status":"正常","addDate":"2026/08/03","renewDate":"2034/01/03","note":"-","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"InfinityFree","email":"admin@wm7.com"}},{"id":"s4","name":"alwaysdata","type":"主机资源","url":"xuwbk.alwaysdata.net","status":"正常","addDate":"2026/08/04","renewDate":"2099/08/04","note":"-","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"alwaysdata","email":""}},{"id":"s5","name":"lima-city","type":"主机资源","url":"xuwbk.4lima.de/","status":"正常","addDate":"2026/08/14","renewDate":"2026/10/31","note":"-","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"lima-city","email":""}},{"id":"s6","name":"phpkj空间","type":"主机资源","url":"xuwbk.dzol.vip/","status":"正常","addDate":"2026/09/07","renewDate":"2027/03/07","note":"到期前30天可续期","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"phpkj","email":""}},{"id":"s7","name":"byethost老牌空间","type":"主机资源","url":"xuwbk.byethost9.com/","status":"正常","addDate":"2026/09/09","renewDate":"2034/06/09","note":"主域名: xuwbk.by...","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"ByetHost","email":""}},{"id":"s8","name":"成都","type":"VPS资源","url":"43.136.130.233/","status":"正常","addDate":"2026/09/15","renewDate":"2027/09/10","note":"-","detail":{"system":"Linux","cpu":"1核","memory":"2GB","disk":"40GB","bandwidth":"100Mbps","traffic":"不限","ip":"1","defense":"基础","virt":"KVM","dc":"腾讯云","panel":"控制台","backup":"快照","os":"Linux","price":"约 ¥50/年","port":"22/80","other":"-","provider":"腾讯云","email":"-"}},{"id":"s9","name":"意大利BotKeep","type":"主机资源","url":"xuwbk.bot-keep.xyz/","status":"正常","addDate":"2026/10/16","renewDate":"2039/12/31","note":"-","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"BotKeep","email":""}},{"id":"s10","name":"荷兰DeployBase","type":"主机资源","url":"xuwbk.cc.dl/","status":"失效","addDate":"2026/10/16","renewDate":"2039/12/31","note":"-","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"基础","domainType":"子域名/可绑定域名","bandwidth":"视服务商而定","mail":"视服务商而定","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"视服务商而定","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"DeployBase","email":""}},{"id":"s11","name":"免费域名","type":"域名资源","url":"xuwbk.lovie.me/","status":"正常","addDate":"2026/10/18","renewDate":"2027/10/18","note":"-","detail":{"suffix":".me","registrar":"Lovie","regPrice":"免费","renewPrice":"免费","transferIn":"免费","privacy":"支持","dns":"支持","transferable":"可转移","realname":"不需要","icp":"不需要","regYears":"1年","regDate":"2026/10/18","status":"正常","provider":"Lovie","email":"-"}},{"id":"def_host_1","name":"彩虹云主机","type":"主机资源","url":"mblog.xuwbk.com","status":"正常","addDate":"2026/05/01","renewDate":"2027/05/01","note":"免费空间示例（默认数据）","detail":{"space":"1 GB","ad":"视服务商而定","selfad":"允许","upload":"FTP/浏览器","editor":"在线文件管理器","domainType":"子域名/可绑定域名","bandwidth":"不限","mail":"支持","db":"MySQL","stat":"有","pwd":"有","speed":"即时","fileLimit":"无","inactive":"30 天","security":"基本防护","script":"PHP · MySQL","provider":"彩虹云","email":""}},{"id":"def_vps_1","name":"成都云服务器","type":"VPS资源","url":"www.xuwbk-vps.com","status":"正常","addDate":"2026/06/01","renewDate":"2027/06/01","note":"KVM 云服务器示例（默认数据）","detail":{"space":"20 GB+","ad":"无广告","selfad":"允许","upload":"SSH/SFTP","editor":"高级（完全控制）","domainType":"独立IP / 可绑定域名","bandwidth":"1 TB+/月","mail":"可自建","db":"全部支持","stat":"可自建","pwd":"有 (SSH Key)","speed":"即时/数分钟","fileLimit":"无限制","inactive":"不限","security":"自行配置防火墙","script":"全部支持","provider":"示例云","email":""}},{"id":"def_dom_1","name":"免费域名 .me","type":"域名资源","url":"xuwbk.lovie.me","status":"正常","addDate":"2026/10/18","renewDate":"2027/10/18","note":"-","detail":{"suffix":".me","registrar":"Lovie","regPrice":"免费","renewPrice":"免费","transferIn":"免费","privacy":"支持","dns":"支持","transferable":"可转移","realname":"不需要","icp":"不需要","regYears":"1年","regDate":"2026/10/18","status":"正常","provider":"Lovie","email":"-"}},{"id":"def_other_1","name":"在线配色工具","type":"其他资源","url":"www.xuwbk-tools.com","status":"正常","addDate":"2026/03/01","renewDate":"2027/03/01","note":"常用在线工具示例（默认数据）","detail":{"rtype":"在线工具","usage":"配色","access":"网页","valid":"长期","limit":"无","link":"-","note":"常用","provider":"-","email":""}}];
+  var TYPE_FIELDS = {
+    '主机资源':[
+      {k:'space',label:'空间'},{k:'ad',label:'广告'},{k:'selfad',label:'自有广告',type:'select',opts:['允许','不允许']},
+      {k:'upload',label:'上传方式'},{k:'editor',label:'编辑端'},{k:'domainType',label:'域名类型'},
+      {k:'bandwidth',label:'带宽'},{k:'mail',label:'邮箱'},{k:'db',label:'数据库'},
+      {k:'stat',label:'统计',type:'select',opts:['有','无','视服务商而定']},
+      {k:'pwd',label:'密码保护'},{k:'speed',label:'激活速度'},{k:'fileLimit',label:'文件限制'},
+      {k:'inactive',label:'不活跃'},{k:'security',label:'安全'},{k:'script',label:'脚本'}
+    ],
+    'VPS资源':[
+      {k:'space',label:'空间'},{k:'ad',label:'广告'},{k:'selfad',label:'自有广告',type:'select',opts:['允许','不允许']},
+      {k:'upload',label:'上传方式'},{k:'editor',label:'编辑端'},{k:'domainType',label:'域名类型'},
+      {k:'bandwidth',label:'带宽'},{k:'mail',label:'邮箱'},{k:'db',label:'数据库'},
+      {k:'stat',label:'统计',type:'select',opts:['有','无','视服务商而定']},
+      {k:'pwd',label:'密码保护'},{k:'speed',label:'激活速度'},{k:'fileLimit',label:'文件限制'},
+      {k:'inactive',label:'不活跃'},{k:'security',label:'安全'},{k:'script',label:'脚本'}
+    ],
+    '域名资源':[
+      {k:'suffix',label:'后缀'},{k:'registrar',label:'注册商'},{k:'regPrice',label:'注册价'},{k:'renewPrice',label:'续费价格'},
+      {k:'transferIn',label:'转入价'},{k:'privacy',label:'隐私保护',type:'select',opts:['支持','不支持']},
+      {k:'dns',label:'DNS',type:'select',opts:['支持','不支持']},{k:'transferable',label:'可转移',type:'select',opts:['可转移','不可转移']},
+      {k:'realname',label:'实名',type:'select',opts:['需要','不需要']},{k:'icp',label:'备案',type:'select',opts:['需要','不需要']},
+      {k:'regYears',label:'注册年限'},{k:'regDate',label:'注册时间'},{k:'status',label:'状态'}
+    ],
+    '其他资源':[
+      {k:'rtype',label:'资源类型'},{k:'usage',label:'用途'},{k:'access',label:'访问方式'},{k:'valid',label:'有效期'},
+      {k:'limit',label:'限制'},{k:'link',label:'链接'},{k:'note',label:'备注'}
+    ]
+  };
+  var DEFAULTS = {
+    '主机资源': {space:'1 GB',ad:'视服务商而定',selfad:'允许',upload:'FTP/浏览器',editor:'基础',domainType:'子域名/可绑定域名',bandwidth:'视服务商而定',mail:'视服务商而定',db:'MySQL',stat:'有',pwd:'有',speed:'即时',fileLimit:'视服务商而定',inactive:'30 天',security:'',script:''},
+    'VPS资源': {space:'20 GB+',ad:'无广告',selfad:'允许',upload:'SSH/SFTP',editor:'高级（完全控制）',domainType:'独立IP / 可绑定域名',bandwidth:'1 TB+/月',mail:'可自建',db:'全部支持',stat:'可自建',pwd:'有 (SSH Key)',speed:'即时/数分钟',fileLimit:'无限制',inactive:'不限',security:'自行配置防火墙',script:'全部支持'},
+    '域名资源': {suffix:'.me',registrar:'Lovie',regPrice:'免费',renewPrice:'免费',transferIn:'免费',privacy:'支持',dns:'支持',transferable:'可转移',realname:'不需要',icp:'不需要',regYears:'1年',regDate:'2026/10/18',status:'正常'},
+    '其他资源': {rtype:'在线工具',usage:'配色',access:'网页',valid:'长期',limit:'无',link:'-',note:'常用'}
+  };
+  var DEFAULTS_TOP = {
+    '主机资源': {},
+    'VPS资源': {},
+    '域名资源': {provider:'Lovie',email:'-',renewDate:'2027/10/18',note:'-'},
+    '其他资源': {provider:'-',email:'-',renewDate:'2027/03/01',note:'常用在线工具示例（默认数据）'}
+  };
+  function applyTopDefaults(f, type){
+    var t=DEFAULTS_TOP[type]||{};
+    for(var k in t){ var el=f.elements[k]; if(!el) continue; if(el.value && el.value.trim()!=='') continue;
+      var v=t[k]; if(k==='renewDate'||k==='addDate') v=(v||'').replace(/\//g,'-'); el.value=v; }
+  }
+  function q(id){return document.getElementById(id);}
+
+  ['serviceListPanel','pwdModal','formModal','submitModal','friendlinkModal','flSuccessCenter'].forEach(function(id){var el=q(id);if(el && el.parentNode!==document.body){document.body.appendChild(el);}});
+
+  function showSuccess(msg,type){
+    var el=q('flSuccessCenter'); if(!el) return;
+    el.textContent=msg;
+    el.className='fl-success-center show'+(type==='err'?' err':'');
+    clearTimeout(window.__flT);
+    window.__flT=setTimeout(function(){el.className='fl-success-center';},2400);
+  }
+  function openOverlay(id){var el=q(id);if(el){el.classList.add('open');}}
+  function closeOverlay(id){var el=q(id);if(el){el.classList.remove('open');}}
+  function pad(n){return n<10?'0'+n:''+n;}
+  function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  function fmtDisp(v){return v?v.replace(/-/g,'/'):'';}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function calcDays(renew){ if(!renew) return ''; var d=new Date(renew.replace(/-/g,'/')); if(isNaN(d)) return ''; var diff=Math.ceil((d-new Date())/86400000); return diff>=0? diff+' 天' : '已过期'; }
+  function typeCls(t){ return t==='VPS资源'?'vps': t==='域名资源'?'dom': t==='其他资源'?'other':'free'; }
+  var MEM=null;
+  function load(){
+    var raw=null; try{ raw=localStorage.getItem(KEY); }catch(e){ raw=null; }
+    var seeded=false; try{ seeded=localStorage.getItem(KEY+'_seeded')==='1'; }catch(e){}
+    if(raw===null){
+      if(MEM) return MEM;
+      var seed=JSON.parse(JSON.stringify(SEED));
+      MEM=seed; try{ localStorage.setItem(KEY, JSON.stringify(seed)); localStorage.setItem(KEY+'_seeded','1'); }catch(e){}
+      return seed;
+    }
+    var base=[]; try{ base=JSON.parse(raw)||[]; }catch(e){ base=[]; }
+    if(!seeded){
+      var seen={}; base.forEach(function(x){ seen[x.id]=1; });
+      JSON.parse(JSON.stringify(SEED)).forEach(function(x){ if(!seen[x.id]) base.push(x); });
+      MEM=base; try{ localStorage.setItem(KEY, JSON.stringify(base)); localStorage.setItem(KEY+'_seeded','1'); }catch(e){}
+    }
+    return base;
+  }
+  function persist(list){ MEM=list; try{localStorage.setItem(KEY, JSON.stringify(list));}catch(e){} }
+  function find(id){ var l=load(); for(var i=0;i<l.length;i++){ if(l[i].id===id) return l[i]; } return null; }
+
+  var curType='', curStatus='', curKw='';
+  function filtered(){ return load().filter(function(it){
+    if(curType && it.type!==curType) return false;
+    if(curStatus && it.status!==curStatus) return false;
+    if(curKw && (it.name+' '+it.url).toLowerCase().indexOf(curKw)<0) return false;
+    return true; }); }
+
+  function render(){
+    var tb=q('slBody'); if(!tb) return; tb.innerHTML='';
+    filtered().forEach(function(it){
+      var days=calcDays(it.renewDate);
+      var ok=it.status!=='失效';
+      var tr=document.createElement('tr');
+      tr.className='sl-data'; tr.setAttribute('data-id', it.id);
+      tr.innerHTML='<td><input type="checkbox"></td>'+
+        '<td><a href="javascript:" class="sl-name">'+esc(it.name)+'</a></td>'+
+        '<td><span class="sl-badge '+typeCls(it.type)+'">'+esc(it.type)+'</span></td>'+
+        '<td>'+esc(it.url)+'</td>'+
+        '<td><span class="sl-pill '+(ok?'ok':'bad')+'">'+(ok?'正常':'失效')+'</span></td>'+
+        '<td>'+esc(it.addDate)+'</td>'+
+        '<td>'+esc(it.renewDate)+'</td>'+
+        '<td class="sl-days">'+esc(days)+'</td>'+
+        '<td class="sl-note">'+esc(it.note||'-')+'</td>'+
+        '<td><div class="sl-actions">'+
+          '<button type="button" data-act="view" title="查看">◎</button>'+
+          '<button type="button" data-act="edit" title="编辑">✎</button>'+
+          '<button type="button" data-act="refresh" title="刷新">⟳</button>'+
+          '<button type="button" data-act="delete" title="删除">✕</button>'+
+        '</div></td>';
+      tb.appendChild(tr);
+      var dr=document.createElement('tr');
+      dr.className='sl-detail'; dr.setAttribute('data-detail', it.id);
+      var d=it.detail||{};
+      var rows=[['状态', ok?'正常':'失效'],['类型', it.type],['服务商', d.provider||'-'],['关联邮箱', d.email||'-'],['到期', (days? days+'后':'')+' ('+(it.renewDate||'-')+')'],['备注', it.note||'-']];
+      (TYPE_FIELDS[it.type]||[]).forEach(function(f){ rows.push([f.label, d[f.k]||'-']); });
+      dr.innerHTML='<td colspan="10"><div class="sl-detail-inner">'+rows.map(function(r){return '<div class="sl-detail-item">'+r[0]+'<b>'+esc(r[1])+'</b></div>';}).join('')+'</div></td>';
+      tb.appendChild(dr);
+    });
+  }
+
+  function toggleDetail(id){
+    var dr=document.querySelector('tr.sl-detail[data-detail="'+id+'"]'); if(!dr) return;
+    var willOpen=!dr.classList.contains('open');
+    Array.prototype.forEach.call(document.querySelectorAll('#slBody tr.sl-detail.open'),function(x){x.classList.remove('open');});
+    if(willOpen){ dr.classList.add('open'); }
+  }
+
+  var body=q('slBody');
+  if(body){ body.addEventListener('click', function(e){
+    var tr=e.target.closest? e.target.closest('tr.sl-data') : null;
+    var btn=e.target.closest? e.target.closest('button[data-act]') : null;
+    var id=tr? tr.getAttribute('data-id') : null;
+    if(btn){
+      e.preventDefault(); e.stopPropagation();
+      var act=btn.getAttribute('data-act');
+      if(act==='view'){ toggleDetail(id); }
+      else if(act==='edit'){ var it=find(id); if(it){ askPassword('编辑服务', function(){ openForm(it); }); } }
+      else if(act==='refresh'){ render(); showSuccess('已刷新'); }
+      else if(act==='delete'){ doDelete(id); }
+      return;
+    }
+    if(tr){ toggleDetail(id); }
+  });}
+
+  function doDelete(id){
+    var it=find(id); if(!it) return;
+    if(!window.confirm('确定删除服务「'+it.name+'」吗？此操作不可恢复。')) return;
+    persist(load().filter(function(x){return x.id!==id;}));
+    render(); showSuccess('已删除');
+  }
+
+  var pendingFn=null;
+  function askPassword(title, fn){
+    if(!q('pwdModal')) return;
+    q('pwdTitle').textContent=title||'添加服务';
+    q('pwdInput').value='';
+    pendingFn=fn||null;
+    openOverlay('pwdModal');
+    setTimeout(function(){ if(q('pwdInput')) q('pwdInput').focus(); },60);
+  }
+  if(q('pwdOk')){ q('pwdOk').addEventListener('click', function(){
+    if(q('pwdInput').value!==PWD){ showSuccess('密码错误，请重试','err'); return; }
+    closeOverlay('pwdModal');
+    var fn=pendingFn; pendingFn=null; if(fn) fn();
+  });}
+  if(q('pwdCancel')){ q('pwdCancel').addEventListener('click', function(){ pendingFn=null; closeOverlay('pwdModal'); }); }
+  if(q('pwdInput')){ q('pwdInput').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); if(q('pwdOk')) q('pwdOk').click(); } }); }
+
+  function buildFeature(type, vals){
+    var defs=TYPE_FIELDS[type]||[];
+    var html='<div class="sl-form-grid">';
+    defs.forEach(function(f){
+      var v=(vals&&vals[f.k]!=null)?vals[f.k]:'';
+      if(f.type==='select'){
+        html+='<div class="sl-field"><label>'+f.label+'</label><select class="form-control" name="'+f.k+'">'+f.opts.map(function(o){return '<option value="'+o+'"'+(String(o)===String(v)?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>';
+      } else {
+        html+='<div class="sl-field"><label>'+f.label+'</label><input class="form-control" name="'+f.k+'" value="'+esc(v)+'"></div>';
+      }
+    });
+    html+='</div>';
+    return html;
+  }
+  function collectFeature(){
+    var obj={}; var box=q('sl-feature-fields'); if(!box) return obj;
+    Array.prototype.forEach.call(box.querySelectorAll('[name]'),function(el){ obj[el.name]=el.value; });
+    return obj;
+  }
+
+  function openForm(item){
+    var f=q('serviceForm'); if(!f) return;
+    f.reset();
+    q('formTitle').textContent = item? '编辑服务' : '添加服务';
+    f.elements['id'].value = item? item.id : '';
+    var type = item? item.type : '主机资源';
+    if(item){
+      f.elements['name'].value=item.name||'';
+      f.elements['type'].value=type;
+      f.elements['url'].value=item.url||'';
+      f.elements['addDate'].value=(item.addDate||'').replace(/\//g,'-')||today();
+      f.elements['renewDate'].value=(item.renewDate||'').replace(/\//g,'-');
+      f.elements['note'].value=item.note||'';
+      var d=item.detail||{};
+      f.elements['provider'].value=d.provider||'';
+      f.elements['email'].value=d.email||'';
+    } else {
+      f.elements['addDate'].value=today();
+      f.elements['port'].value='80';
+    }
+    if(q('sl-feature-fields')){ q('sl-feature-fields').innerHTML=buildFeature(type, item? (item.detail||{}) : (DEFAULTS[type]||{})); }
+    if(!item) applyTopDefaults(f, type);
+    openOverlay('formModal');
+  }
+
+  var typeSel=(q('serviceForm')? q('serviceForm').elements['type']:null);
+  if(typeSel){ typeSel.addEventListener('change', function(){
+    var f=q('serviceForm'); var isEdit=!!f.elements['id'].value; var type=this.value;
+    var vals=collectFeature(); var base=isEdit?{}:(DEFAULTS[type]||{}); var merged={};
+    for(var k in base) merged[k]=base[k]; for(var k in vals) merged[k]=vals[k];
+    if(q('sl-feature-fields')) q('sl-feature-fields').innerHTML=buildFeature(type, merged);
+    if(!isEdit) applyTopDefaults(f, type);
+  }); }
+
+  if(q('sl-add-btn')){ q('sl-add-btn').addEventListener('click', function(){ askPassword('添加服务', function(){ openForm(null); }); }); }
+  if(q('formReset')){ q('formReset').addEventListener('click', function(){
+    var f=q('serviceForm'); var id=f.elements['id'].value;
+    if(id){ var it=find(id); if(it) openForm(it); } else { f.reset(); f.elements['addDate'].value=today(); f.elements['port'].value='80'; if(q('sl-feature-fields')) q('sl-feature-fields').innerHTML=buildFeature('主机资源', DEFAULTS['主机资源']||{}); applyTopDefaults(f, '主机资源'); }
+  });}
+  if(q('detailToggle')){ q('detailToggle').addEventListener('click', function(){ var sec=this.parentNode; sec.classList.toggle('collapsed'); var t=sec.querySelector('.sl-toggle'); if(t) t.textContent=sec.classList.contains('collapsed')?'展开':'收起'; }); }
+
+  if(q('serviceForm')){ q('serviceForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f=this;
+    var name=f.elements['name'].value.trim();
+    var type=f.elements['type'].value;
+    var url=f.elements['url'].value.trim();
+    var renew=f.elements['renewDate'].value;
+    if(!name||!type||!url||!renew){ showSuccess('请填写服务名称、类型、地址和续费时间','err'); return; }
+    var id=f.elements['id'].value;
+    var detail={ provider:f.elements['provider'].value.trim(), email:f.elements['email'].value.trim() };
+    var box=q('sl-feature-fields');
+    Array.prototype.forEach.call(box.querySelectorAll('[name]'),function(el){ detail[el.name]=el.value.trim(); });
+    var item={ id:id||('s'+Date.now()), name:name, type:type, url:url, status:'正常',
+      addDate:fmtDisp(f.elements['addDate'].value)||fmtDisp(today()),
+      renewDate:fmtDisp(renew), note:f.elements['note'].value.trim(), detail:detail };
+    if(id){ var old=find(id); if(old){ item.status=old.status||'正常'; } var list=load(); for(var i=0;i<list.length;i++){ if(list[i].id===id){ list[i]=item; break; } } persist(list); }
+    else { var l2=load(); l2.push(item); persist(l2); }
+    render(); closeOverlay('formModal'); showSuccess(id?'已保存修改':'已添加服务');
+  });}
+
+  if(q('sl-type')){ q('sl-type').addEventListener('change', function(){ curType=this.value; render(); }); }
+  if(q('sl-status')){ q('sl-status').addEventListener('change', function(){ curStatus=this.value; render(); }); }
+  if(q('sl-search')){ q('sl-search').addEventListener('input', function(){ curKw=this.value.toLowerCase().trim(); render(); }); }
+
+  var navSL=q('nav-service-list');
+  if(navSL){ navSL.addEventListener('click', function(e){ e.preventDefault(); render(); q('serviceListPanel').classList.add('open'); document.body.style.overflow='hidden'; }); }
+  if(q('sl-close')){ q('sl-close').addEventListener('click', function(){ q('serviceListPanel').classList.remove('open'); document.body.style.overflow=''; }); }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.js-open-submit'),function(a){ a.addEventListener('click',function(e){ e.preventDefault(); openOverlay('submitModal'); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('.js-open-friendlink'),function(a){ a.addEventListener('click',function(e){ e.preventDefault(); openOverlay('friendlinkModal'); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-fl-close]'),function(b){ b.addEventListener('click',function(){ var ov=b.closest('.fl-overlay'); if(ov) ov.classList.remove('open'); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('.fl-overlay'),function(ov){ ov.addEventListener('click',function(e){ if(e.target===ov) ov.classList.remove('open'); }); });
+
+  if(q('submitFormInline')){ q('submitFormInline').addEventListener('submit', function(e){
+    e.preventDefault(); var f=this;
+    var n=f.elements['name'].value.trim(), u=f.elements['url'].value.trim(), d=f.elements['desc'].value.trim(),
+        c=f.elements['contact'].value.trim(), ic=f.elements['icon'].value.trim(), cat=f.elements['category'].value;
+    if(!n||!u||!d){ showSuccess('请填写网站名称、地址和描述','err'); return; }
+    if(window.XuWbkFriendLink){ window.XuWbkFriendLink.apply({name:n,url:u,desc:d,contact:c,icon:ic,category:cat,source:'site'}); }
+    f.reset(); closeOverlay('submitModal'); showSuccess('提交成功！审核通过后将展示在首页对应分类板块');
+  });}
+
+  if(q('friendFormInline')){ q('friendFormInline').addEventListener('submit', function(e){
+    e.preventDefault(); var f=this;
+    var n=f.elements['name'].value.trim(), u=f.elements['url'].value.trim(), d=f.elements['desc'].value.trim(), c=f.elements['contact'].value.trim();
+    if(!n||!u||!d){ showSuccess('请填写网站名称、地址和描述','err'); return; }
+    if(window.XuWbkFriendLink){ window.XuWbkFriendLink.apply({name:n,url:u,desc:d,contact:c,source:'link'}); }
+    f.reset(); closeOverlay('friendlinkModal'); showSuccess('友链申请已提交，等待管理员审核');
+  });}
+
+  render();
+})();
+</script>
+
+
 </body>
 </html>
 
