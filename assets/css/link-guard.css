@@ -1,0 +1,246 @@
+/*!
+ * * 《轩玮导航》 - 外链跳转确认弹窗样式
+ * @package XuWbk
+ * @author 轩玮
+ * @contact QQ:6050640 邮箱：6050640@qq.com 网址：www.xuwbk.com
+ */
+.lg-mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100200;
+    background: rgba(17, 24, 39, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .18s ease, visibility .18s ease;
+}
+
+.lg-mask.lg-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lg-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 34px 34px 20px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, .22);
+    transform: translateY(10px) scale(.97);
+    transition: transform .2s ease;
+    box-sizing: border-box;
+}
+
+.lg-mask.lg-open .lg-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.lg-logo {
+    display: block;
+    height: 42px;
+    width: auto;
+    max-width: 80%;
+    margin: 0 auto 20px;
+}
+
+.lg-title {
+    margin: 0 0 10px;
+    font-size: 21px;
+    font-weight: 400;
+    color: #333;
+    line-height: 1.4;
+}
+
+.lg-sub {
+    margin: 0 0 18px;
+    font-size: 14px;
+    color: #909090;
+    line-height: 1.5;
+}
+
+.lg-url {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    margin: 0 0 26px;
+    background: #eaf3fd;
+    border-radius: 3px;
+    text-align: left;
+}
+
+.lg-url-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 3px;
+    background: #dbe8f7;
+    color: #4a7fb5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lg-url-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.lg-url-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+    color: #4f7cc0;
+    line-height: 1.5;
+    word-break: break-all;
+}
+
+.lg-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.lg-btn {
+    flex: 1 1 0;
+    max-width: 190px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 22px;
+    font-size: 15px;
+    background: #fff;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .18s, color .18s, border-color .18s;
+    font-family: inherit;
+}
+
+.lg-btn-go {
+    border: 1px solid #a9c9f5;
+    color: #1a73e8;
+}
+
+.lg-btn-go:hover {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: #fff;
+}
+
+.lg-btn-home {
+    border: 1px solid #d3d6da;
+    color: #5f6368;
+}
+
+.lg-btn-home:hover {
+    background: #f1f3f4;
+}
+
+.lg-secure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #b0b3b8;
+}
+
+.lg-secure-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: #8d9196;
+    letter-spacing: .5px;
+}
+
+.lg-secure-top svg {
+    width: 26px;
+    height: 26px;
+    color: #9aa0a6;
+}
+
+.lg-secure-text {
+    font-size: 12px;
+    color: #a9b4c4;
+    padding-left: 2px;
+}
+
+@media (max-width: 420px) {
+    .lg-dialog {
+        padding: 26px 20px 16px;
+    }
+
+    .lg-logo {
+        height: 34px;
+        margin-bottom: 16px;
+    }
+
+    .lg-title {
+        font-size: 18px;
+    }
+
+    .lg-actions {
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .lg-btn {
+        height: 42px;
+        font-size: 14px;
+    }
+}
+
+body.lg-locked {
+    overflow: hidden;
+}
+
+/* 夜间模式 */
+body.io-black-mode .lg-dialog,
+body.night .lg-dialog {
+    background: #22262d;
+}
+
+body.io-black-mode .lg-title,
+body.night .lg-title {
+    color: #eee;
+}
+
+body.io-black-mode .lg-url,
+body.night .lg-url {
+    background: #2b3038;
+}
+
+body.io-black-mode .lg-url-icon,
+body.night .lg-url-icon {
+    background: #343b45;
+    color: #8fb4e0;
+}
+
+body.io-black-mode .lg-url-text,
+body.night .lg-url-text {
+    color: #8fb4e0;
+}
+
+body.io-black-mode .lg-btn,
+body.night .lg-btn {
+    background: transparent;
+}
+
+body.io-black-mode .lg-btn-home,
+body.night .lg-btn-home {
+    border-color: #3d434c;
+    color: #c2c7ce;
+}

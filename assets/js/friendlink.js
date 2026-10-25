@@ -18,6 +18,13 @@
     var STORE_KEY = 'xuwbk_friendlink_v1';
     var ADMIN_KEY = 'xuwbk_friendlink_admin';
     var ADMIN_PASSWORD = 'xuwbk.com';
+    /* 服务器共享数据文件：上传到网站 data/links.json 后，所有设备都能读到同一份数据 */
+    var BASE = './';
+    var currentScript = document.currentScript;
+    if (currentScript && currentScript.src) {
+        BASE = currentScript.src.replace(/assets\/js\/friendlink\.js(\?.*)?$/i, '');
+    }
+    var SERVER_JSON = BASE + 'data/links.json';
     var DEFAULT_ICON = 'assets/images/default-icon.webp';
     var DEFAULT_CATEGORY = '常用工具';
     var FAVICON_SCHEME = 'https://';
@@ -33,6 +40,8 @@
     ];
 
     var memoryStore = [];
+    /* 导入备份时用于选择备份文件（文本框为空时使用） */
+    var importFileInput = null;
 
     /* ------------------------------ 数据仓储 ------------------------------ */
 
@@ -194,6 +203,81 @@
         write(data);
         renderAll();
         return true;
+    }
+
+    /* ------------------------------ 服务器 JSON 同步 ------------------------------ */
+
+    /** 合并服务器数据：服务器为准，保留本机独有的记录 */
+    function mergeServer(server) {
+        if (Object.prototype.toString.call(server) !== '[object Array]' || !server.length) {
+            return false;
+        }
+        var map = {};
+        server.forEach(function (item) {
+            if (item && item.id) {
+                map[item.id] = item;
+            }
+        });
+        read().forEach(function (item) {
+            if (item && item.id && !map[item.id]) {
+                map[item.id] = item;
+            }
+        });
+        write(Object.keys(map).map(function (key) {
+            return map[key];
+        }));
+        return true;
+    }
+
+    /** 拉取 data/links.json，实现跨设备一致（服务器文件不存在时静默降级为本地数据） */
+    function syncFromServer(cb) {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', SERVER_JSON + '?_=' + Date.now(), true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState !== 4) {
+                    return;
+                }
+                var ok = false;
+                if (xhr.status === 200 && xhr.responseText) {
+                    try {
+                        ok = mergeServer(JSON.parse(xhr.responseText));
+                    } catch (e) {
+                        ok = false;
+                    }
+                }
+                if (ok) {
+                    renderAll();
+                }
+                if (cb) {
+                    cb(ok);
+                }
+            };
+            xhr.onerror = function () {
+                if (cb) {
+                    cb(false);
+                }
+            };
+            xhr.send();
+        } catch (e) {
+            if (cb) {
+                cb(false);
+            }
+        }
+    }
+
+    /** 下载当前数据为 links.json，供上传到服务器 data/ 目录 */
+    function downloadJson() {
+        var blob = new Blob([JSON.stringify(list(), null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'links.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.setTimeout(function () {
+            URL.revokeObjectURL(a.href);
+        }, 1500);
     }
 
     /* ------------------------------ 工具方法 ------------------------------ */
@@ -674,14 +758,32 @@
                     });
                 }
 
-                showCode(out.join('\n') || '<!-- 暂无已通过的记录 -->');
+                var code = out.join('\n');
+                if (!code) {
+                    return toast('暂无已通过的记录', 'err');
+                }
+                showCode(code);
+                toast('已生成静态代码，请在下方文本框全选复制', 'ok');
             });
         }
 
         var exportJson = document.getElementById('fl-export-json');
         if (exportJson) {
             exportJson.addEventListener('click', function () {
-                showCode(JSON.stringify(list(), null, 2));
+                var all = list();
+                if (!all.length) {
+                    return toast('暂无可备份的数据', 'err');
+                }
+                showCode(JSON.stringify(all, null, 2));
+                toast('已生成备份数据（' + all.length + ' 条），请在下方文本框全选复制', 'ok');
+            });
+        }
+
+        var downloadBtn = document.getElementById('fl-download-json');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function () {
+                downloadJson();
+                toast('已下载 links.json，上传覆盖网站 data/links.json 即可全设备同步', 'ok');
             });
         }
 
@@ -690,24 +792,53 @@
             importBtn.addEventListener('click', function () {
                 var area = document.getElementById('fl-code');
                 if (!area || !area.value.trim()) {
-                    return toast('请先粘贴备份数据', 'err');
+                    /* 文本框为空时，改用选择备份文件的方式导入 */
+                    if (!importFileInput) {
+                        importFileInput = document.createElement('input');
+                        importFileInput.type = 'file';
+                        importFileInput.accept = 'application/json,.json';
+                        importFileInput.style.display = 'none';
+                        document.body.appendChild(importFileInput);
+                        importFileInput.addEventListener('change', function () {
+                            var file = this.files && this.files[0];
+                            if (!file) {
+                                return;
+                            }
+                            var rd = new FileReader();
+                            rd.onload = function () {
+                                var ok = importData(rd.result);
+                                toast(ok ? '导入成功' : '数据格式不正确（需要 JSON 数组）', ok ? 'ok' : 'err');
+                            };
+                            rd.readAsText(file);
+                            this.value = '';
+                        });
+                    }
+                    importFileInput.click();
+                    toast('请选择备份文件，或把数据粘贴到下方文本框后再点导入', 'err');
+                    return;
                 }
                 var ok = importData(area.value);
-                toast(ok ? '导入成功' : '数据格式不正确', ok ? 'ok' : 'err');
+                toast(ok ? '导入成功' : '数据格式不正确（需要 JSON 数组）', ok ? 'ok' : 'err');
             });
         }
 
         var clearBtn = document.getElementById('fl-clear-rejected');
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
-                if (!window.confirm('确认清空所有已驳回的申请？')) {
+                var bad = read().filter(function (item) {
+                    return item.status === 'rejected';
+                });
+                if (!bad.length) {
+                    return toast('没有已驳回的记录', 'ok');
+                }
+                if (!window.confirm('确认清空 ' + bad.length + ' 条已驳回的申请？')) {
                     return;
                 }
                 write(read().filter(function (item) {
                     return item.status !== 'rejected';
                 }));
                 renderAll();
-                toast('已清空驳回记录', 'ok');
+                toast('已清空 ' + bad.length + ' 条驳回记录', 'ok');
             });
         }
     }
@@ -719,10 +850,23 @@
             return;
         }
         area.value = code;
+        /* 注意：CSS 里 .fl-code-wrap 默认 display:none，这里必须显式显示，否则导出没有任何可见效果 */
         if (wrap) {
-            wrap.style.display = '';
+            wrap.style.display = 'block';
+            try {
+                wrap.scrollIntoView({ block: 'nearest' });
+            } catch (e) {
+                wrap.scrollIntoView(false);
+            }
         }
-        area.select();
+        try {
+            area.focus();
+            area.setSelectionRange(0, area.value.length);
+        } catch (e) {
+            try {
+                area.select();
+            } catch (e2) { /* ignore */ }
+        }
     }
 
     /* ------------------------------ 编辑弹窗 ------------------------------ */
@@ -926,6 +1070,7 @@
         bindEditForm();
         toggleAdminView();
         renderAll();
+        syncFromServer();
         window.addEventListener('storage', function (e) {
             if (e.key === STORE_KEY) {
                 renderAll();
@@ -945,6 +1090,8 @@
         restore: restore,
         remove: remove,
         importData: importData,
+        syncFromServer: syncFromServer,
+        downloadJson: downloadJson,
         isAdmin: isAdmin,
         login: login,
         logout: logout,
