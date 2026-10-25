@@ -1104,7 +1104,7 @@ function switchNightMode(){
           <div class="sl-field"><label>端口</label><input class="form-control" name="port" placeholder="80"></div>
           <div class="sl-field"><label>添加时间</label><input type="date" class="form-control" name="addDate"></div>
           <div class="sl-field"><label>续费/到期时间<span style="color:#e05252">*</span></label><input type="date" class="form-control" name="renewDate"></div>
-          <div class="sl-field"><label>服务商</label><input class="form-control" name="provider" placeholder="例如：InfinityFree"></div>
+          <div class="sl-field"><label>服务商</label><input class="form-control" name="provider" placeholder="名称|网址，如 lima-city|https://www.lima-city.de/"></div>
           <div class="sl-field"><label>关联邮箱</label><input class="form-control" name="email" placeholder="account@example.com"></div>
         </div>
         <div class="sl-field" style="margin-top:14px"><label>备注</label><textarea class="form-control" name="note" placeholder="记录账号信息、特殊配置等..."></textarea></div>
@@ -1224,6 +1224,21 @@ function switchNightMode(){
   function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
   function fmtDisp(v){return v?v.replace(/-/g,'/'):'';}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  /* 服务商：支持「网址」或「显示名|网址」；只填网址时自动取主域名作显示名（www.lima-city.de → lima-city） */
+  function provParse(v){
+    var s=String(v||'').trim(); if(!s) return { name:'', url:'' };
+    var name='', url=s, p=s.indexOf('|');
+    if(p>-1){ name=s.slice(0,p).trim(); url=s.slice(p+1).trim(); }
+    if(url && !/^https?:\/\//i.test(url)){ url=/^[a-z0-9-]+(\.[a-z0-9-]+)+([\/?#][^\s]*)?$/i.test(url)? 'https://'+url : ''; }
+    if(!name && url){
+      var host=url.replace(/^https?:\/\//i,'').split(/[\/?#]/)[0].replace(/^www\./i,'');
+      var parts=host.split('.');
+      name=parts.length===2? parts[0] : host;
+    }
+    if(!name) name=s;
+    return { name:name, url:url };
+  }
+  function provHtml(v){ var p=provParse(v); if(!p.name) return '-'; return p.url? '<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.name)+'</a>' : esc(p.name); }
   function calcDays(renew){ if(!renew) return ''; var d=new Date(renew.replace(/-/g,'/')); if(isNaN(d)) return ''; var diff=Math.ceil((d-new Date())/86400000); return diff>=0? diff+' 天' : '已过期'; }
   function typeCls(t){ return t==='VPS资源'?'vps': t==='域名资源'?'dom': t==='其他资源'?'other':'free'; }
   var MEM=null;
@@ -1284,7 +1299,7 @@ function switchNightMode(){
       var d=it.detail||{};
       var statusPill='<span class="sl-pill '+(ok?'ok':'bad')+'">'+(ok?'正常':'失效')+'</span>';
       var typeLink='<a href="javascript:" class="sl-type-link" data-type="'+esc(it.type)+'">'+esc(it.type)+'</a>';
-      var provLink=d.provider? '<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.provider)+'" target="_blank" rel="noopener">'+esc(d.provider)+'</a>' : '-';
+      var provLink=provHtml(d.provider);
       var rows=[['状态', statusPill],['类型', typeLink],['地址/域名', urlHtml],['服务商', provLink],['关联邮箱', esc(d.email||'-')],['到期', esc((days? days+'后':'')+' ('+(it.renewDate||'-')+')')],['备注', esc(it.note||'-')]];
       (TYPE_FIELDS[it.type]||[]).forEach(function(f){ rows.push([f.label, esc(d[f.k]||'-')]); });
       dr.innerHTML='<td colspan="10"><div class="sl-detail-inner">'+rows.map(function(r){return '<div class="sl-detail-item">'+r[0]+'<b>'+r[1]+'</b></div>';}).join('')+'</div></td>';
