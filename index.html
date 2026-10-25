@@ -209,6 +209,13 @@
                 <div class="border-top py-2 border-color">
                     <div class="flex-bottom">
                         <ul>
+                            <li id="menu-item-214"
+                                class="menu-item menu-item-type-post_type menu-item-object-page sidebar-item sidebar-activity">
+                                <a href="activity.html">
+                                    <i class="xw-ico xw-book icon-fw icon-lg mr-2"></i>
+                                    <span>活动线报</span></a>
+                            </li>
+
                             <li id="menu-item-237"
                                 class="menu-item menu-item-type-post_type menu-item-object-page menu-item-237 sidebar-item">
                                 <a href="javascript:" class="js-open-submit">
@@ -365,6 +372,10 @@
                         </li>
 
 
+                        <li class="nav-item d-md-none mobile-activity ml-3 ml-md-4">
+                            <a href="activity.html" title="活动线报" aria-label="活动线报"><i class="xw-ico xw-book"
+                                    style="font-size:22px"></i></a>
+                        </li>
                         <li class="nav-search ml-3 ml-md-4">
                             <a href="javascript:" data-toggle="modal" data-target="#search-modal"><i
                                     class="iconfont icon-search icon-2x"></i></a>
@@ -9423,7 +9434,7 @@ function switchNightMode(){
       if(act==='view'){ toggleDetail(id); }
       else if(act==='edit'){ var it=find(id); if(it){ askPassword('编辑服务', function(){ openForm(it); }); } }
       else if(act==='refresh'){ render(); showSuccess('已刷新'); }
-      else if(act==='delete'){ doDelete(id); }
+      else if(act==='delete'){ var del=find(id); if(del){ askPassword('删除服务', function(){ doDelete(id); }); } }
       return;
     }
     if(tr){ toggleDetail(id); }
@@ -9564,10 +9575,41 @@ function switchNightMode(){
     f.reset(); closeOverlay('friendlinkModal'); showSuccess('友链申请已提交，等待管理员审核');
   });}
 
+  // ===== 服务器 JSON 同步（共享数据，跨设备一致） =====
+  function applyServer(server){
+    if(!Array.isArray(server) || !server.length) return false;
+    var local = load(); var map = {};
+    server.forEach(function(x){ if(x && x.id) map[x.id] = x; });
+    local.forEach(function(x){ if(x && x.id && !map[x.id]) map[x.id] = x; });
+    var merged = Object.keys(map).map(function(k){ return map[k]; });
+    MEM = merged;
+    try { localStorage.setItem(KEY, JSON.stringify(merged)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
+    return true;
+  }
+  function syncFromServer(cb){
+    try{
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'data/services.json?_=' + Date.now(), true);
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState !== 4) return;
+        var ok = false;
+        if(xhr.status === 200 && xhr.responseText){
+          try { ok = applyServer(JSON.parse(xhr.responseText)); } catch(e){ ok = false; }
+        }
+        if(cb) cb(ok);
+      };
+      xhr.onerror = function(){ if(cb) cb(false); };
+      xhr.send();
+    }catch(e){ if(cb) cb(false); }
+  }
+
   render();
+  syncFromServer(function(){ render(); });
 })();
 </script>
 
+<!-- ===== 外链跳转确认弹窗（居中） ===== -->
+<script type="text/javascript" src="./assets/js/link-guard.js"></script>
 
 </body>
 </html>
