@@ -168,6 +168,7 @@
         write(read().filter(function (item) {
             return item.id !== id;
         }));
+        markDeleted(id);
         renderAll();
         return true;
     }
@@ -201,31 +202,71 @@
             return false;
         }
         write(data);
+        clearDeleted();
         renderAll();
         return true;
     }
 
     /* ------------------------------ 服务器 JSON 同步 ------------------------------ */
 
-    /** 合并服务器数据：服务器为准，保留本机独有的记录 */
+    /** 本机删除过的记录 id（墓碑）：服务器 JSON 不会再把它们加回来 */
+    function readDeleted() {
+        try {
+            var v = JSON.parse(window.localStorage.getItem(STORE_KEY + '_deleted'));
+            return Object.prototype.toString.call(v) === '[object Array]' ? v : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function markDeleted(id) {
+        if (!id) {
+            return;
+        }
+        var d = readDeleted();
+        if (d.indexOf(id) < 0) {
+            d.push(id);
+            try {
+                window.localStorage.setItem(STORE_KEY + '_deleted', JSON.stringify(d));
+            } catch (e) { /* ignore */ }
+        }
+    }
+
+    function clearDeleted() {
+        try {
+            window.localStorage.removeItem(STORE_KEY + '_deleted');
+        } catch (e) { /* ignore */ }
+    }
+
+    /** 合并服务器数据：本机为准，服务器只补充本机没有（且未被本机删除）的记录 */
     function mergeServer(server) {
         if (Object.prototype.toString.call(server) !== '[object Array]' || !server.length) {
             return false;
         }
-        var map = {};
-        server.forEach(function (item) {
+        var local = read();
+        var have = {};
+        local.forEach(function (item) {
             if (item && item.id) {
-                map[item.id] = item;
+                have[item.id] = true;
             }
         });
-        read().forEach(function (item) {
-            if (item && item.id && !map[item.id]) {
-                map[item.id] = item;
-            }
+        var dead = {};
+        readDeleted().forEach(function (id) {
+            dead[id] = true;
         });
-        write(Object.keys(map).map(function (key) {
-            return map[key];
-        }));
+        var added = 0;
+        server.forEach(function (item) {
+            if (!item || !item.id || have[item.id] || dead[item.id]) {
+                return;
+            }
+            local.push(item);
+            have[item.id] = true;
+            added++;
+        });
+        if (!added) {
+            return false;
+        }
+        write(local);
         return true;
     }
 
@@ -834,9 +875,13 @@
                 if (!window.confirm('确认清空 ' + bad.length + ' 条已驳回的申请？')) {
                     return;
                 }
+                var gone = bad.map(function (item) {
+                    return item.id;
+                });
                 write(read().filter(function (item) {
                     return item.status !== 'rejected';
                 }));
+                gone.forEach(markDeleted);
                 renderAll();
                 toast('已清空 ' + bad.length + ' 条驳回记录', 'ok');
             });
