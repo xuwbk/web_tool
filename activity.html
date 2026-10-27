@@ -1557,6 +1557,26 @@ function switchNightMode(){
     try { localStorage.setItem(KEY, JSON.stringify(local)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
     return true;
   }
+  function hashStr(s){ var h=5381,i=0; for(;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))|0; } return 'h'+h+'_'+s.length; }
+  function replaceLocal(server){
+    MEM = server;
+    try { localStorage.setItem(KEY, JSON.stringify(server)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
+  }
+  /* data/services.json 是"已发布的快照"，规则：
+     1) 本机没有数据（换设备 / 无痕）→ 直接采用快照
+     2) 快照内容变了（你重新导出发并上传过）→ 采用新快照
+     3) 快照没变 → 以本机数据为准，编辑/删除绝不会被还原 */
+  function handleServer(server, hash){
+    if(!Array.isArray(server) || !server.length) return false;
+    var last = null; try { last = localStorage.getItem(KEY+'_srv'); } catch(e){}
+    if(__firstVisit || (last !== null && last !== hash)){
+      try { localStorage.setItem(KEY+'_srv', hash); } catch(e){}
+      replaceLocal(server);
+      return true;
+    }
+    if(last === null){ try { localStorage.setItem(KEY+'_srv', hash); } catch(e){} }
+    return false;
+  }
   function syncFromServer(cb){
     try{
       var xhr = new XMLHttpRequest();
@@ -1565,7 +1585,10 @@ function switchNightMode(){
         if(xhr.readyState !== 4) return;
         var ok = false;
         if(xhr.status === 200 && xhr.responseText){
-          try { ok = applyServer(JSON.parse(xhr.responseText)); } catch(e){ ok = false; }
+          try {
+            var txt = String(xhr.responseText).replace(/^\uFEFF/, '');
+            ok = handleServer(JSON.parse(txt), hashStr(txt));
+          } catch(e){ ok = false; }
         }
         if(cb) cb(ok);
       };
@@ -1573,6 +1596,32 @@ function switchNightMode(){
       xhr.send();
     }catch(e){ if(cb) cb(false); }
   }
+
+  /* ===== 存储可用性检测：被禁用时明确提示，避免"改了又没" ===== */
+  function storageAvailable(){
+    try { var k='__xw_store_test__'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; } catch(e){ return false; }
+  }
+  function showStorageWarning(){
+    if(document.getElementById('xw-storage-warn')) return;
+    var d=document.createElement('div');
+    d.id='xw-storage-warn';
+    d.style.cssText='position:fixed;left:0;right:0;top:0;z-index:2147483000;background:#c62828;color:#fff;font-size:13px;line-height:1.6;padding:8px 34px 8px 12px;text-align:center;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.25)';
+    d.innerHTML='浏览器禁止了本站的本地存储（Cookie / 站点数据），这里的修改无法保存。<br>请允许本站保存数据，或退出无痕模式后再试。<span id="xw-storage-warn-x" style="position:absolute;right:10px;top:6px;cursor:pointer;font-size:16px;line-height:1">×</span>';
+    document.body.appendChild(d);
+    var x=document.getElementById('xw-storage-warn-x');
+    if(x) x.addEventListener('click', function(){ if(d.parentNode) d.parentNode.removeChild(d); });
+  }
+
+  var __firstVisit = (function(){ try { return localStorage.getItem(KEY) === null; } catch(e){ return true; } })();
+  var __canStore = storageAvailable();
+  if(!__canStore) showStorageWarning();
+  if(q('sl-del-invalid') && q('sl-del-invalid').parentNode){
+    var __ver=document.createElement('span');
+    __ver.style.cssText='font-size:11px;color:#c6c6c6;margin-left:6px;user-select:none';
+    __ver.textContent='v1027b';
+    q('sl-del-invalid').parentNode.appendChild(__ver);
+  }
+  try { console.log('[xuwbk] services v1027b | storage=' + (__canStore?'ok':'blocked') + ' | firstVisit=' + __firstVisit); } catch(e){}
 
   render();
   syncFromServer(function(){ render(); });
