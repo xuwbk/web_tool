@@ -9459,6 +9459,7 @@ function switchNightMode(){
     var it=find(id); if(!it) return;
     if(!window.confirm('确定删除服务「'+it.name+'」吗？此操作不可恢复。')) return;
     persist(load().filter(function(x){return x.id!==id;}));
+    markDeleted(id);
     render(); showSuccess('已删除');
   }
 
@@ -9591,14 +9592,32 @@ function switchNightMode(){
   });}
 
   // ===== 服务器 JSON 同步（共享数据，跨设备一致） =====
+  /* 本机删除过的记录 id（墓碑）：服务器 JSON 不会再把它们加回来 */
+  function readDeleted(){
+    try { var v = JSON.parse(localStorage.getItem(KEY+'_deleted')); return Array.isArray(v) ? v : []; } catch(e){ return []; }
+  }
+  function markDeleted(id){
+    if(!id) return;
+    var d = readDeleted();
+    if(d.indexOf(id) < 0){ d.push(id); try { localStorage.setItem(KEY+'_deleted', JSON.stringify(d)); } catch(e){} }
+  }
+  function clearDeleted(){ try { localStorage.removeItem(KEY+'_deleted'); } catch(e){} }
+  /* 本机数据为准：服务器 JSON 只补充本机没有（且未被本机删除）的记录，绝不覆盖本机的编辑结果 */
   function applyServer(server){
     if(!Array.isArray(server) || !server.length) return false;
-    var local = load(); var map = {};
-    server.forEach(function(x){ if(x && x.id) map[x.id] = x; });
-    local.forEach(function(x){ if(x && x.id && !map[x.id]) map[x.id] = x; });
-    var merged = Object.keys(map).map(function(k){ return map[k]; });
-    MEM = merged;
-    try { localStorage.setItem(KEY, JSON.stringify(merged)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
+    var local = load(); var have = {}; var added = 0;
+    local.forEach(function(x){ if(x && x.id) have[x.id] = 1; });
+    var dead = {}; readDeleted().forEach(function(id){ dead[id] = 1; });
+    var seed = {}; SEED.forEach(function(x){ if(x && x.id) seed[x.id] = 1; });
+    server.forEach(function(x){
+      if(!x || !x.id || have[x.id] || dead[x.id]) return;
+      /* 基线记录已在本机被删除：登记墓碑，避免被服务器文件再加回来 */
+      if(seed[x.id]){ markDeleted(x.id); dead[x.id] = 1; return; }
+      local.push(x); have[x.id] = 1; added++;
+    });
+    if(!added) return false;
+    MEM = local;
+    try { localStorage.setItem(KEY, JSON.stringify(local)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
     return true;
   }
   function syncFromServer(cb){
