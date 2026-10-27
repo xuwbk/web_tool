@@ -270,6 +270,47 @@
         return true;
     }
 
+    function hashStr(s) {
+        var h = 5381, i = 0;
+        for (; i < s.length; i++) {
+            h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+        }
+        return 'h' + h + '_' + s.length;
+    }
+
+    /** data/links.json 是"已发布的快照"：
+     *  1) 本机没有数据（换设备/无痕）→ 采用快照
+     *  2) 快照变了（重新下载上传过）→ 采用新快照
+     *  3) 快照没变 → 以本机为准，编辑/删除不会被还原 */
+    function handleServer(server, hash) {
+        if (Object.prototype.toString.call(server) !== '[object Array]' || !server.length) {
+            return false;
+        }
+        var last = null;
+        try {
+            last = window.localStorage.getItem(STORE_KEY + '_srv');
+        } catch (e) { /* ignore */ }
+        var firstVisit = false;
+        try {
+            firstVisit = window.localStorage.getItem(STORE_KEY) === null;
+        } catch (e) {
+            firstVisit = true;
+        }
+        if (firstVisit || (last !== null && last !== hash)) {
+            try {
+                window.localStorage.setItem(STORE_KEY + '_srv', hash);
+            } catch (e) { /* ignore */ }
+            write(server);
+            return true;
+        }
+        if (last === null) {
+            try {
+                window.localStorage.setItem(STORE_KEY + '_srv', hash);
+            } catch (e) { /* ignore */ }
+        }
+        return false;
+    }
+
     /** 拉取 data/links.json，实现跨设备一致（服务器文件不存在时静默降级为本地数据） */
     function syncFromServer(cb) {
         try {
@@ -282,7 +323,8 @@
                 var ok = false;
                 if (xhr.status === 200 && xhr.responseText) {
                     try {
-                        ok = mergeServer(JSON.parse(xhr.responseText));
+                        var txt = String(xhr.responseText).replace(/^\uFEFF/, '');
+                        ok = handleServer(JSON.parse(txt), hashStr(txt));
                     } catch (e) {
                         ok = false;
                     }
