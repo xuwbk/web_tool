@@ -69,15 +69,28 @@
         });
         if (dirty) {
             try {
-                window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+                fkSet(STORE_KEY, JSON.stringify(list));
             } catch (e) { /* ignore */ }
         }
         return list;
     }
 
+    /* ===== 统一存储层：localStorage 优先，Cookie 兜底 =====
+       某些浏览器 / 无痕 / 被嵌在受限 iframe 时 localStorage 会被禁用，
+       导致"改了又没保存、无痕恢复默认"。这里在 localStorage 不可用时自动用 Cookie 兜底。 */
+    function _fkEsc(s){ try{ return encodeURIComponent(s); }catch(e){ try{ return escape(s); }catch(e2){ return ''; } } }
+    function _fkUn(s){ try{ return decodeURIComponent(s); }catch(e){ try{ return unescape(s); }catch(e2){ return ''; } } }
+    function _fkPut(name,val){ try{ var d=new Date(Date.now()+400*864e5).toUTCString(); document.cookie=name+'='+val+';expires='+d+';path=/;SameSite=Lax'; }catch(e){} }
+    function _fkGet(name){ try{ var m=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'=([^;]*)')); return m?_fkUn(m[1]):''; }catch(e){ return ''; } }
+    function _fkSet(k,v){ try{ var enc=_fkEsc(v); var pre='fk1_'+k.replace(/[^a-zA-Z0-9_]/g,'_'); var n=Math.ceil(enc.length/3500), i; _fkPut(pre+'_n', String(n)); for(i=0;i<n;i++){ _fkPut(pre+'_'+i, enc.slice(i*3500,(i+1)*3500)); } }catch(e){} }
+    function _fkDel(k){ try{ var pre='fk1_'+k.replace(/[^a-zA-Z0-9_]/g,'_'); var n=parseInt(_fkGet(pre+'_n')||'0',10), i; if(n){ for(i=0;i<n;i++){ _fkPut(pre+'_'+i,''); } } _fkPut(pre+'_n',''); }catch(e){} }
+    function fkGet(k){ var v=null; try{ v=window.localStorage.getItem(k); }catch(e){ v=null; } if(v!==null&&v!==undefined) return v; var c=_fkGet(k); return c?c:null; }
+    function fkSet(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){} _fkSet(k,v); }
+    function fkDel(k){ try{ window.localStorage.removeItem(k); }catch(e){} _fkDel(k); }
+
     function read() {
         try {
-            var raw = window.localStorage.getItem(STORE_KEY);
+            var raw = fkGet(STORE_KEY);
             var list = raw ? JSON.parse(raw) : [];
             if (Object.prototype.toString.call(list) !== '[object Array]') {
                 return [];
@@ -91,9 +104,9 @@
     function write(list) {
         memoryStore = list;
         try {
-            window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+            fkSet(STORE_KEY, JSON.stringify(list));
         } catch (e) {
-            /* 隐私模式或存储不可用时降级为内存存储 */
+            /* 隐私模式或存储不可用时降级为内存 + Cookie 兜底 */
         }
         return list;
     }
@@ -212,7 +225,7 @@
     /** 本机删除过的记录 id（墓碑）：服务器 JSON 不会再把它们加回来 */
     function readDeleted() {
         try {
-            var v = JSON.parse(window.localStorage.getItem(STORE_KEY + '_deleted'));
+            var v = JSON.parse(fkGet(STORE_KEY + '_deleted') || '[]');
             return Object.prototype.toString.call(v) === '[object Array]' ? v : [];
         } catch (e) {
             return [];
@@ -227,14 +240,14 @@
         if (d.indexOf(id) < 0) {
             d.push(id);
             try {
-                window.localStorage.setItem(STORE_KEY + '_deleted', JSON.stringify(d));
+                fkSet(STORE_KEY + '_deleted', JSON.stringify(d));
             } catch (e) { /* ignore */ }
         }
     }
 
     function clearDeleted() {
         try {
-            window.localStorage.removeItem(STORE_KEY + '_deleted');
+            fkDel(STORE_KEY + '_deleted');
         } catch (e) { /* ignore */ }
     }
 
@@ -286,27 +299,23 @@
         if (Object.prototype.toString.call(server) !== '[object Array]' || !server.length) {
             return false;
         }
-        var last = null;
-        try {
-            last = window.localStorage.getItem(STORE_KEY + '_srv');
-        } catch (e) { /* ignore */ }
+        var last = fkGet(STORE_KEY + '_srv');
         var firstVisit = false;
         try {
-            firstVisit = window.localStorage.getItem(STORE_KEY) === null;
+            firstVisit = fkGet(STORE_KEY) === null;
         } catch (e) {
             firstVisit = true;
         }
-        if (firstVisit || (last !== null && last !== hash)) {
+        /* 本地数据始终优先：只有本机完全没有数据（首次访问 / 新会话）时才采用快照；
+           一旦本机已有数据，绝不再用快照覆盖用户编辑，避免"改了又没保存"。 */
+        if (!last) {
             try {
-                window.localStorage.setItem(STORE_KEY + '_srv', hash);
+                fkSet(STORE_KEY + '_srv', hash);
             } catch (e) { /* ignore */ }
-            write(server);
-            return true;
-        }
-        if (last === null) {
-            try {
-                window.localStorage.setItem(STORE_KEY + '_srv', hash);
-            } catch (e) { /* ignore */ }
+            if (firstVisit) {
+                write(server);
+                return true;
+            }
         }
         return false;
     }
@@ -456,6 +465,9 @@
     /* ------------------------------ 视图渲染 ------------------------------ */
 
     /** 渲染已通过的分类网址：插入到首页对应分类卡片区（如「常用工具」） */
+    /* 「主机/域名/VPS/其他资源」四个分类由服务后台（xuwbk_services_v1）专门管理，
+       友链投稿不再渲染进这几个区块，避免与后台数据重复。 */
+    var RESOURCE_CATS = ['主机资源', '域名资源', 'VPS资源', '其他资源'];
     function renderSiteCards() {
         var old = document.querySelectorAll('[data-fl-card]');
         Array.prototype.forEach.call(old, function (node) {
@@ -465,7 +477,7 @@
         });
 
         var sites = byStatus('approved').filter(function (item) {
-            return item.source === 'site';
+            return item.source === 'site' && RESOURCE_CATS.indexOf(categoryOf(item)) < 0;
         });
         var boxes = document.querySelectorAll('[data-nav-category]');
         if (!sites.length || !boxes.length) {
