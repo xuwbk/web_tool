@@ -1338,24 +1338,37 @@ function switchNightMode(){
   function calcDays(renew){ if(!renew) return ''; var d=new Date(renew.replace(/-/g,'/')); if(isNaN(d)) return ''; var diff=Math.ceil((d-new Date())/86400000); return diff>=0? diff+' 天' : '已过期'; }
   function typeCls(t){ return t==='VPS资源'?'vps': t==='域名资源'?'dom': t==='其他资源'?'other':'free'; }
   var MEM=null;
+  /* ===== 统一存储层：localStorage 优先，Cookie 兜底 =====
+     某些浏览器 / 无痕 / 被嵌在受限 iframe 时 localStorage 会被禁用，
+     导致"改了又没保存、无痕恢复默认"。这里在 localStorage 不可用时自动用 Cookie 兜底，保证数据能落盘。 */
+  function _ckEsc(s){ try{ return encodeURIComponent(s); }catch(e){ try{ return escape(s); }catch(e2){ return ''; } } }
+  function _ckUn(s){ try{ return decodeURIComponent(s); }catch(e){ try{ return unescape(s); }catch(e2){ return ''; } } }
+  function _ckPut(name,val){ try{ var d=new Date(Date.now()+400*864e5).toUTCString(); document.cookie=name+'='+val+';expires='+d+';path=/;SameSite=Lax'; }catch(e){} }
+  function _ckGet(name){ try{ var m=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'=([^;]*)')); return m?_ckUn(m[1]):''; }catch(e){ return ''; } }
+  function _ckSet(k,v){ try{ var enc=_ckEsc(v); var pre='xw1_'+k.replace(/[^a-zA-Z0-9_]/g,'_'); var n=Math.ceil(enc.length/3500), i; _ckPut(pre+'_n', String(n)); for(i=0;i<n;i++){ _ckPut(pre+'_'+i, enc.slice(i*3500,(i+1)*3500)); } }catch(e){} }
+  function _ckDel(k){ try{ var pre='xw1_'+k.replace(/[^a-zA-Z0-9_]/g,'_'); var n=parseInt(_ckGet(pre+'_n')||'0',10), i; if(n){ for(i=0;i<n;i++){ _ckPut(pre+'_'+i,''); } } _ckPut(pre+'_n',''); }catch(e){} }
+  function xwGet(k){ var v=null; try{ v=localStorage.getItem(k); }catch(e){ v=null; } if(v!==null && v!==undefined) return v; var c=_ckGet(k); return c?c:null; }
+  function xwSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} _ckSet(k,v); }
+  function xwDel(k){ try{ localStorage.removeItem(k); }catch(e){} _ckDel(k); }
+  function xwAvail(){ try{ var t='__xw_store_test__'; localStorage.setItem(t,'1'); localStorage.removeItem(t); return true; }catch(e){} try{ _ckPut('__xw_ck_test__','1'); var ok=_ckGet('__xw_ck_test__')==='1'; _ckPut('__xw_ck_test__',''); return ok; }catch(e){ return false; } }
   function load(){
-    var raw=null; try{ raw=localStorage.getItem(KEY); }catch(e){ raw=null; }
-    var seeded=false; try{ seeded=localStorage.getItem(KEY+'_seeded')==='1'; }catch(e){}
+    var raw=xwGet(KEY);
+    var seeded=xwGet(KEY+'_seeded')==='1';
     if(raw===null){
       if(MEM) return MEM;
       var seed=JSON.parse(JSON.stringify(SEED));
-      MEM=seed; try{ localStorage.setItem(KEY, JSON.stringify(seed)); localStorage.setItem(KEY+'_seeded','1'); }catch(e){}
+      MEM=seed; xwSet(KEY, JSON.stringify(seed)); xwSet(KEY+'_seeded','1');
       return seed;
     }
     var base=[]; try{ base=JSON.parse(raw)||[]; }catch(e){ base=[]; }
     if(!seeded){
       var seen={}; base.forEach(function(x){ seen[x.id]=1; });
       JSON.parse(JSON.stringify(SEED)).forEach(function(x){ if(!seen[x.id]) base.push(x); });
-      MEM=base; try{ localStorage.setItem(KEY, JSON.stringify(base)); localStorage.setItem(KEY+'_seeded','1'); }catch(e){}
+      MEM=base; xwSet(KEY, JSON.stringify(base)); xwSet(KEY+'_seeded','1');
     }
     return base;
   }
-  function persist(list){ MEM=list; try{localStorage.setItem(KEY, JSON.stringify(list));}catch(e){} }
+  function persist(list){ MEM=list; xwSet(KEY, JSON.stringify(list)); }
   function find(id){ var l=load(); for(var i=0;i<l.length;i++){ if(l[i].id===id) return l[i]; } return null; }
 
   var curType='', curStatus='', curKw='';
@@ -1365,7 +1378,53 @@ function switchNightMode(){
     if(curKw && (it.name+' '+it.url).toLowerCase().indexOf(curKw)<0) return false;
     return true; }); }
 
+  /* 把服务后台管理的「主机 / 域名 / VPS / 其他资源」渲染到首页对应导航区块 */
+  function renderResourceCards(){
+    if(!document.querySelectorAll) return;
+    var cats=['主机资源','域名资源','VPS资源','其他资源'];
+    var items=load(); if(!items||!items.length) return;
+    var boxes=document.querySelectorAll('[data-nav-category]');
+    if(!boxes||!boxes.length) return;
+    Array.prototype.forEach.call(boxes, function(box){
+      var cat=box.getAttribute('data-nav-category');
+      if(cats.indexOf(cat)<0) return;
+      var olds=box.querySelectorAll('[data-svc-card]');
+      Array.prototype.forEach.call(olds, function(n){ if(n.parentNode) n.parentNode.removeChild(n); });
+      var list=items.filter(function(it){ return it && it.type===cat; });
+      list.sort(function(a,b){ var x=(a.addDate||'').replace(/\//g,'-'), y=(b.addDate||'').replace(/\//g,'-'); return x<y?1:(x>y?-1:0); });
+      list.forEach(function(it){ box.insertAdjacentHTML('beforeend', svcCardHtml(it)); });
+    });
+  }
+  function svcCardHtml(it){
+    var raw=String(it.url||'');
+    if(!/^https?:\/\//i.test(raw)) raw=raw?'https://'+raw:'';
+    var host=raw.replace(/^https?:\/\//i,'').split('/')[0];
+    var fav=host?('https://www.google.com/s2/favicons?sz=64&domain='+encodeURIComponent(host)):'assets/images/default-icon.webp';
+    var name=esc(it.name||'未命名');
+    var desc=esc(it.note||it.provider||'');
+    var url=esc(raw||'#');
+    return '<div class="url-card col-6 col-sm-6 col-md-4 col-xl-5a col-xxl-6a" data-svc-card="'+(it.id||'')+'">'+
+      '<div class="url-body default">'+
+        '<a href="'+url+'" target="_blank" data-id="" data-url="'+url+'" class="card no-c mb-4" data-toggle="tooltip" data-placement="bottom" data-original-title="'+desc+'">'+
+          '<div class="card-body">'+
+            '<div class="url-content d-flex align-items-center">'+
+              '<div class="url-img mr-2 d-flex align-items-center justify-content-center">'+
+                '<img class="lazy" src="'+fav+'" data-src="'+fav+'" onerror="javascript:this.src=\'assets/images/default-icon.webp\';this.onerror=null;" alt="'+name+'">'+
+              '</div>'+
+              '<div class="url-info flex-fill">'+
+                '<div class="text-sm overflowClip_1"><strong>'+name+'</strong></div>'+
+                '<p class="overflowClip_1 m-0 text-muted text-xs">'+desc+'</p>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+        '</a>'+
+        '<a href="'+url+'" class="togo text-center text-muted is-views" data-id="" data-toggle="tooltip" data-placement="right" title="直达" rel="nofollow"><i class="iconfont icon-goto"></i></a>'+
+      '</div>'+
+    '</div>';
+  }
+
   function render(){
+    renderResourceCards();
     var tb=q('slBody'); if(!tb) return; tb.innerHTML='';
     filtered().forEach(function(it){
       var days=calcDays(it.renewDate);
@@ -1428,6 +1487,7 @@ function switchNightMode(){
     persist(load().filter(function(x){return x.id!==id;}));
     markDeleted(id);
     render(); showSuccess('已删除');
+    pushToServer(load(), function(ok){ if(!ok) showSuccess('本地已删除，但发布到服务器失败（请检查 api/services.php 写权限）','err'); });
   }
 
   var pendingFn=null;
@@ -1583,6 +1643,7 @@ function switchNightMode(){
     if(id){ var old=find(id); if(old){ item.status=old.status||'正常'; } var list=load(); for(var i=0;i<list.length;i++){ if(list[i].id===id){ list[i]=item; break; } } persist(list); }
     else { var l2=load(); l2.push(item); persist(l2); }
     render(); closeOverlay('formModal'); showSuccess(id?'已保存修改':'已添加服务');
+    pushToServer(load(), function(ok){ if(!ok) showSuccess('已保存到本地，但发布到服务器失败（请检查 api/services.php 写权限）','err'); });
   });}
 
   if(q('sl-type')){ q('sl-type').addEventListener('change', function(){ curType=this.value; render(); }); }
@@ -1618,14 +1679,14 @@ function switchNightMode(){
   // ===== 服务器 JSON 同步（共享数据，跨设备一致） =====
   /* 本机删除过的记录 id（墓碑）：服务器 JSON 不会再把它们加回来 */
   function readDeleted(){
-    try { var v = JSON.parse(localStorage.getItem(KEY+'_deleted')); return Array.isArray(v) ? v : []; } catch(e){ return []; }
+    try { var v = JSON.parse(xwGet(KEY+'_deleted')||'[]'); return Array.isArray(v) ? v : []; } catch(e){ return []; }
   }
   function markDeleted(id){
     if(!id) return;
     var d = readDeleted();
-    if(d.indexOf(id) < 0){ d.push(id); try { localStorage.setItem(KEY+'_deleted', JSON.stringify(d)); } catch(e){} }
+    if(d.indexOf(id) < 0){ d.push(id); xwSet(KEY+'_deleted', JSON.stringify(d)); }
   }
-  function clearDeleted(){ try { localStorage.removeItem(KEY+'_deleted'); } catch(e){} }
+  function clearDeleted(){ xwDel(KEY+'_deleted'); }
   /* 本机数据为准：服务器 JSON 只补充本机没有（且未被本机删除）的记录，绝不覆盖本机的编辑结果 */
   function applyServer(server){
     if(!Array.isArray(server) || !server.length) return false;
@@ -1641,33 +1702,47 @@ function switchNightMode(){
     });
     if(!added) return false;
     MEM = local;
-    try { localStorage.setItem(KEY, JSON.stringify(local)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
+    xwSet(KEY, JSON.stringify(local)); xwSet(KEY+'_seeded','1');
     return true;
   }
   function hashStr(s){ var h=5381,i=0; for(;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))|0; } return 'h'+h+'_'+s.length; }
   function replaceLocal(server){
     MEM = server;
-    try { localStorage.setItem(KEY, JSON.stringify(server)); localStorage.setItem(KEY+'_seeded','1'); } catch(e){}
+    xwSet(KEY, JSON.stringify(server)); xwSet(KEY+'_seeded','1');
   }
   /* data/services.json 是"已发布的快照"，规则：
      1) 本机没有数据（换设备 / 无痕）→ 直接采用快照
      2) 快照内容变了（你重新导出发并上传过）→ 采用新快照
      3) 快照没变 → 以本机数据为准，编辑/删除绝不会被还原 */
+  /* data/services.json 是共享的“已发布快照”，服务端为唯一数据源：
+     任何访客（含无痕）每次加载都直接采用服务器上的最新数据，
+     站长保存 / 删除都会即时写回服务端，因此所有人看到的都是最新版本。 */
   function handleServer(server, hash){
     if(!Array.isArray(server) || !server.length) return false;
-    var last = null; try { last = localStorage.getItem(KEY+'_srv'); } catch(e){}
-    if(__firstVisit || (last !== null && last !== hash)){
-      try { localStorage.setItem(KEY+'_srv', hash); } catch(e){}
-      replaceLocal(server);
-      return true;
-    }
-    if(last === null){ try { localStorage.setItem(KEY+'_srv', hash); } catch(e){} }
-    return false;
+    replaceLocal(server);
+    xwSet(KEY+'_srv', hash);
+    return true;
+  }
+  /* 把当前数据发布到服务端（写 data/services.json）。pwd 与后台密码一致。 */
+  function pushToServer(list, cb){
+    try{
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/services.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState !== 4) return;
+        var ok = false;
+        try { var r = JSON.parse(xhr.responseText); ok = !!(r && r.ok); } catch(e){ ok = false; }
+        if(cb) cb(ok, xhr.status);
+      };
+      xhr.onerror = function(){ if(cb) cb(false, 0); };
+      xhr.send(JSON.stringify({ pwd: PWD, data: list }));
+    }catch(e){ if(cb) cb(false, 0); }
   }
   function syncFromServer(cb){
     try{
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'data/services.json?_=' + Date.now(), true);
+      xhr.open('GET', '/data/services.json?_=' + Date.now(), true);
       xhr.onreadystatechange = function(){
         if(xhr.readyState !== 4) return;
         var ok = false;
@@ -1686,7 +1761,7 @@ function switchNightMode(){
 
   /* ===== 存储可用性检测：被禁用时明确提示，避免"改了又没" ===== */
   function storageAvailable(){
-    try { var k='__xw_store_test__'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; } catch(e){ return false; }
+    return xwAvail();
   }
   function showStorageWarning(){
     if(document.getElementById('xw-storage-warn')) return;
@@ -1699,7 +1774,7 @@ function switchNightMode(){
     if(x) x.addEventListener('click', function(){ if(d.parentNode) d.parentNode.removeChild(d); });
   }
 
-  var __firstVisit = (function(){ try { return localStorage.getItem(KEY) === null; } catch(e){ return true; } })();
+  var __firstVisit = (function(){ try { return xwGet(KEY) === null; } catch(e){ return true; } })();
   var __canStore = storageAvailable();
   if(!__canStore) showStorageWarning();
   if(q('sl-del-invalid') && q('sl-del-invalid').parentNode){
