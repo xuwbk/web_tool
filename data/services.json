@@ -210,37 +210,7 @@
       "email": ""
     }
   },
-  {
-    "id": "s8",
-    "name": "成都",
-    "type": "VPS资源",
-    "url": "43.136.130.233/",
-    "status": "正常",
-    "addDate": "2026/09/15",
-    "renewDate": "2027/09/10",
-    "note": "-",
-    "detail": {
-      "system": "Linux",
-      "cpu": "1核",
-      "memory": "2GB",
-      "disk": "40GB",
-      "bandwidth": "100Mbps",
-      "traffic": "不限",
-      "ip": "1",
-      "defense": "基础",
-      "virt": "KVM",
-      "dc": "腾讯云",
-      "panel": "控制台",
-      "backup": "快照",
-      "os": "Linux",
-      "price": "约 ¥50/年",
-      "port": "22/80",
-      "other": "-",
-      "provider": "腾讯云",
-      "email": "-"
-    }
-  },
-  {
+ {
     "id": "s9",
     "name": "意大利BotKeep",
     "type": "主机资源",
@@ -327,67 +297,7 @@
       "email": "-"
     }
   },
-  {
-    "id": "def_host_1",
-    "name": "彩虹云主机",
-    "type": "主机资源",
-    "url": "mblog.xuwbk.com",
-    "status": "正常",
-    "addDate": "2026/05/01",
-    "renewDate": "2027/05/01",
-    "note": "免费空间示例（默认数据）",
-    "detail": {
-      "space": "1 GB",
-      "ad": "视服务商而定",
-      "selfad": "允许",
-      "upload": "FTP/浏览器",
-      "editor": "在线文件管理器",
-      "domainType": "子域名/可绑定域名",
-      "bandwidth": "不限",
-      "mail": "支持",
-      "db": "MySQL",
-      "stat": "有",
-      "pwd": "有",
-      "speed": "即时",
-      "fileLimit": "无",
-      "inactive": "30 天",
-      "security": "基本防护",
-      "script": "PHP · MySQL",
-      "provider": "彩虹云",
-      "email": ""
-    }
-  },
-  {
-    "id": "def_vps_1",
-    "name": "成都云服务器",
-    "type": "VPS资源",
-    "url": "www.xuwbk-vps.com",
-    "status": "正常",
-    "addDate": "2026/06/01",
-    "renewDate": "2027/06/01",
-    "note": "KVM 云服务器示例（默认数据）",
-    "detail": {
-      "space": "20 GB+",
-      "ad": "无广告",
-      "selfad": "允许",
-      "upload": "SSH/SFTP",
-      "editor": "高级（完全控制）",
-      "domainType": "独立IP / 可绑定域名",
-      "bandwidth": "1 TB+/月",
-      "mail": "可自建",
-      "db": "全部支持",
-      "stat": "可自建",
-      "pwd": "有 (SSH Key)",
-      "speed": "即时/数分钟",
-      "fileLimit": "无限制",
-      "inactive": "不限",
-      "security": "自行配置防火墙",
-      "script": "全部支持",
-      "provider": "示例云",
-      "email": ""
-    }
-  },
-  {
+ {
     "id": "def_dom_1",
     "name": "免费域名 .me",
     "type": "域名资源",
