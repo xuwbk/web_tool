@@ -157,6 +157,7 @@
         var arr = read();
         arr.push(record);
         write(arr);
+        pushToServer(read());
         renderAll();
         return record;
     }
@@ -182,6 +183,7 @@
             return item.id !== id;
         }));
         markDeleted(id);
+        pushToServer(read());
         renderAll();
         return true;
     }
@@ -199,6 +201,7 @@
         });
         if (hit) {
             write(arr);
+            pushToServer(read());
         }
         renderAll();
         return hit;
@@ -216,6 +219,7 @@
         }
         write(data);
         clearDeleted();
+        pushToServer(read());
         renderAll();
         return true;
     }
@@ -291,33 +295,36 @@
         return 'h' + h + '_' + s.length;
     }
 
-    /** data/links.json 是"已发布的快照"：
-     *  1) 本机没有数据（换设备/无痕）→ 采用快照
-     *  2) 快照变了（重新下载上传过）→ 采用新快照
-     *  3) 快照没变 → 以本机为准，编辑/删除不会被还原 */
+    /* data/links.json 是共享的"已发布快照"（提交到 Git 仓库即可发布）。
+       任何访客（含无痕）每次加载都直接采用该快照，因此所有人看到的都是同一份最新数据。 */
     function handleServer(server, hash) {
         if (Object.prototype.toString.call(server) !== '[object Array]' || !server.length) {
             return false;
         }
-        var last = fkGet(STORE_KEY + '_srv');
-        var firstVisit = false;
+        write(server);
         try {
-            firstVisit = fkGet(STORE_KEY) === null;
-        } catch (e) {
-            firstVisit = true;
-        }
-        /* 本地数据始终优先：只有本机完全没有数据（首次访问 / 新会话）时才采用快照；
-           一旦本机已有数据，绝不再用快照覆盖用户编辑，避免"改了又没保存"。 */
-        if (!last) {
-            try {
-                fkSet(STORE_KEY + '_srv', hash);
-            } catch (e) { /* ignore */ }
-            if (firstVisit) {
-                write(server);
-                return true;
-            }
-        }
-        return false;
+            fkSet(STORE_KEY + '_srv', hash);
+        } catch (e) { /* ignore */ }
+        return true;
+    }
+
+    /* 纯静态站点（GitHub Pages / Git 托管）：无法向服务端写文件。
+       管理操作落到本地存储，并自动导出最新 links.json；
+       把它提交到 Git 仓库的 data/ 目录并重新部署，即完成“发布”。 */
+    function publishToGit() {
+        try {
+            var data = JSON.stringify(read(), null, 2);
+            var blob = new Blob([data], { type: 'application/json' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'links.json';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+        } catch (e) { /* ignore */ }
+    }
+    function pushToServer(list, cb) {
+        publishToGit();
+        if (cb) { cb(true); }
     }
 
     /** 拉取 data/links.json，实现跨设备一致（服务器文件不存在时静默降级为本地数据） */
